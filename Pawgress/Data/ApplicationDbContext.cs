@@ -12,10 +12,8 @@ namespace Pawgress.Data
         public DbSet<TrainingPath> TrainingPaths { get; set; }
         public DbSet<Note> Notes { get; set; }
         public DbSet<Quiz> Quizzes { get; set; }
-        public DbSet<Page> Pages { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
-        public DbSet<QuizPage> QuizPages { get; set; }
 
         public DbSet<User_DogProfile> UserDogProfiles { get; set; }
         public DbSet<User_TrainingPath> UserTrainingPaths { get; set; }
@@ -70,23 +68,18 @@ namespace Pawgress.Data
                 .WithMany(u => u.Notes)
                 .HasForeignKey(n => n.UserId);
 
-            // 1 - N relatie tussen TrainingPath en Lesson
-            modelBuilder.Entity<Lesson>()
-                .HasOne(l => l.TrainingPath)
-                .WithMany(tp => tp.Lessons)
-                .HasForeignKey(l => l.TrainingPathId);
+            // wip
+            // // 1 - N relatie tussen TrainingPath en Lesson
+            // modelBuilder.Entity<Lesson>()
+            //     .HasOne(l => l.TrainingPath)
+            //     .WithMany(tp => tp.Lessons)
+            //     .HasForeignKey(l => l.TrainingPathId);
 
-            // 1 - N relatie tussen Lesson en Page
-            modelBuilder.Entity<Page>()
-                .HasOne(p => p.Lesson)
-                .WithMany(l => l.Pages)
-                .HasForeignKey(p => p.LessonId);
-
-            // 1 - N Quiz en QuizPage
-            modelBuilder.Entity<Quiz>()
-                .HasMany(q => q.Questions)
-                .WithOne()
-                .HasForeignKey(qp => qp.QuizId);
+            // // 1 - N Quiz en QuizPage
+            // modelBuilder.Entity<Quiz>()
+            //     .HasMany(q => q.Questions)
+            //     .WithOne()
+            //     .HasForeignKey(qp => qp.QuizId);
         }
     }
 }

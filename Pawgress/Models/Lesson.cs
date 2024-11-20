@@ -1,15 +1,18 @@
 using System;
-using System.Collections.Generic;
 
 namespace Pawgress.Models
 {
     public class Lesson
     {
         public Guid LessonId { get; set; }
+        public string Name { get; set; }
+        public string Text { get; set; }
+        public string Video { get; set; }
+        public string Image { get; set; }
+        public string Link { get; set; }
+        public string Tag { get; set; }
         public Guid TrainingPathId { get; set; }
-        public string LessonName { get; set; }
-        public List<Page> Pages { get; set; } = new List<Page>();
-
         public TrainingPath TrainingPath { get; set; }
+
     }
 }

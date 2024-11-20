@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawgress.Data;
 
@@ -11,9 +12,11 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241112143331_UpdatedMigrations")]
+    partial class UpdatedMigrations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,39 +78,14 @@ namespace Pawgress.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FolderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Text")
+                    b.Property<string>("LessonName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("TrainingPathId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Video")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("LessonId");
-
-                    b.HasIndex("FolderId");
 
                     b.HasIndex("TrainingPathId");
 
@@ -146,6 +124,51 @@ namespace Pawgress.Migrations
                     b.ToTable("Notes");
                 });
 
+            modelBuilder.Entity("Pawgress.Models.Page", b =>
+                {
+                    b.Property<Guid>("PageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("FolderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Video")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PageId");
+
+                    b.HasIndex("FolderId");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("Page");
+                });
+
             modelBuilder.Entity("Pawgress.Models.Quiz", b =>
                 {
                     b.Property<Guid>("QuizId")
@@ -154,9 +177,6 @@ namespace Pawgress.Migrations
 
                     b.Property<int>("AchievedScore")
                         .HasColumnType("int");
-
-                    b.Property<Guid?>("FolderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("MaxScore")
                         .HasColumnType("int");
@@ -170,11 +190,48 @@ namespace Pawgress.Migrations
 
                     b.HasKey("QuizId");
 
-                    b.HasIndex("FolderId");
-
                     b.HasIndex("TrainingPathId");
 
                     b.ToTable("Quizzes");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.QuizOption", b =>
+                {
+                    b.Property<Guid>("QuizOptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OptionText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("QuizPageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("QuizOptionId");
+
+                    b.HasIndex("QuizPageId");
+
+                    b.ToTable("QuizOption");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.QuizPage", b =>
+                {
+                    b.Property<Guid>("QuizPageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("QuizId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("QuizPageId");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("QuizPage");
                 });
 
             modelBuilder.Entity("Pawgress.Models.TrainingPath", b =>
@@ -235,6 +292,9 @@ namespace Pawgress.Migrations
                     b.Property<Guid>("DogProfileId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DogProfileId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -244,6 +304,8 @@ namespace Pawgress.Migrations
                     b.HasKey("UserId", "DogProfileId");
 
                     b.HasIndex("DogProfileId");
+
+                    b.HasIndex("DogProfileId1");
 
                     b.ToTable("UserDogProfiles");
                 });
@@ -290,10 +352,6 @@ namespace Pawgress.Migrations
 
             modelBuilder.Entity("Pawgress.Models.Lesson", b =>
                 {
-                    b.HasOne("Pawgress.Models.Folder", null)
-                        .WithMany("Lessons")
-                        .HasForeignKey("FolderId");
-
                     b.HasOne("Pawgress.Models.TrainingPath", "TrainingPath")
                         .WithMany("Lessons")
                         .HasForeignKey("TrainingPathId")
@@ -322,12 +380,23 @@ namespace Pawgress.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Pawgress.Models.Quiz", b =>
+            modelBuilder.Entity("Pawgress.Models.Page", b =>
                 {
                     b.HasOne("Pawgress.Models.Folder", null)
-                        .WithMany("Quizzes")
+                        .WithMany("Pages")
                         .HasForeignKey("FolderId");
 
+                    b.HasOne("Pawgress.Models.Lesson", "Lesson")
+                        .WithMany("Pages")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.Quiz", b =>
+                {
                     b.HasOne("Pawgress.Models.TrainingPath", "TrainingPath")
                         .WithMany("Quizzes")
                         .HasForeignKey("TrainingPathId")
@@ -337,6 +406,22 @@ namespace Pawgress.Migrations
                     b.Navigation("TrainingPath");
                 });
 
+            modelBuilder.Entity("Pawgress.Models.QuizOption", b =>
+                {
+                    b.HasOne("Pawgress.Models.QuizPage", null)
+                        .WithMany("Options")
+                        .HasForeignKey("QuizPageId");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.QuizPage", b =>
+                {
+                    b.HasOne("Pawgress.Models.Quiz", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pawgress.Models.User_DogProfile", b =>
                 {
                     b.HasOne("Pawgress.Models.DogProfile", "DogProfile")
@@ -344,6 +429,10 @@ namespace Pawgress.Migrations
                         .HasForeignKey("DogProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Pawgress.Models.DogProfile", null)
+                        .WithMany("UserProfiles")
+                        .HasForeignKey("DogProfileId1");
 
                     b.HasOne("Pawgress.Models.User", "User")
                         .WithMany("DogProfiles")
@@ -380,15 +469,30 @@ namespace Pawgress.Migrations
                     b.Navigation("Notes");
 
                     b.Navigation("UserDogProfiles");
+
+                    b.Navigation("UserProfiles");
                 });
 
             modelBuilder.Entity("Pawgress.Models.Folder", b =>
                 {
-                    b.Navigation("Lessons");
-
-                    b.Navigation("Quizzes");
+                    b.Navigation("Pages");
 
                     b.Navigation("SubFolders");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.Lesson", b =>
+                {
+                    b.Navigation("Pages");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.Quiz", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("Pawgress.Models.QuizPage", b =>
+                {
+                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("Pawgress.Models.TrainingPath", b =>

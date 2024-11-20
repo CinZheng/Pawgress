@@ -10,7 +10,8 @@ namespace Pawgress.Models
         public string Description { get; set; }
         public Guid? ParentFolderId { get; set; }
         public List<Folder> SubFolders { get; set; } = new List<Folder>();
-        public List<Page> Pages { get; set; } = new List<Page>();
+        public List<Lesson> Lessons { get; set; } = new List<Lesson>();
+        public List<Quiz> Quizzes { get; set; } = new List<Quiz>();
         public Folder ParentFolder { get; set; }
     }
 }
