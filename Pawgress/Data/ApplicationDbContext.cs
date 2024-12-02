@@ -52,9 +52,10 @@ namespace Pawgress.Data
 
             // Folder - self relational mapping
             modelBuilder.Entity<Folder>()
-                .HasOne(f => f.ParentFolder)
-                .WithMany(f => f.SubFolders)
-                .HasForeignKey(f => f.ParentFolderId);
+            .HasOne(f => f.ParentFolder)
+            .WithMany(f => f.SubFolders)
+            .HasForeignKey(f => f.ParentFolderId)
+            .OnDelete(DeleteBehavior.Restrict); // geen cascade-verwijdering
 
             // 1 - N relatie tussen DogProfile en Note
             modelBuilder.Entity<Note>()

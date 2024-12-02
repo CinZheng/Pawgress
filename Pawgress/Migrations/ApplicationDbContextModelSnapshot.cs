@@ -59,7 +59,6 @@ namespace Pawgress.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ParentFolderId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("FolderId");
@@ -282,8 +281,7 @@ namespace Pawgress.Migrations
                     b.HasOne("Pawgress.Models.Folder", "ParentFolder")
                         .WithMany("SubFolders")
                         .HasForeignKey("ParentFolderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentFolder");
                 });

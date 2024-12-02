@@ -12,8 +12,8 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241112155415_MoreUpdatedMigrations")]
-    partial class MoreUpdatedMigrations
+    [Migration("20241202164354_FixFolderDeleteBehavior")]
+    partial class FixFolderDeleteBehavior
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,7 +62,6 @@ namespace Pawgress.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ParentFolderId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("FolderId");
@@ -285,8 +284,7 @@ namespace Pawgress.Migrations
                     b.HasOne("Pawgress.Models.Folder", "ParentFolder")
                         .WithMany("SubFolders")
                         .HasForeignKey("ParentFolderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentFolder");
                 });
