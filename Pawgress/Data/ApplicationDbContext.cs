@@ -14,6 +14,7 @@ namespace Pawgress.Data
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<Library> Libraries { get; set; }
 
         public DbSet<User_DogProfile> UserDogProfiles { get; set; }
         public DbSet<User_TrainingPath> UserTrainingPaths { get; set; }
