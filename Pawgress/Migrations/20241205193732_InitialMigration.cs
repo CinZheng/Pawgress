@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Pawgress.Migrations
 {
     /// <inheritdoc />
-    public partial class FixFolderDeleteBehavior : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -46,6 +46,18 @@ namespace Pawgress.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Libraries",
+                columns: table => new
+                {
+                    LibraryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Libraries", x => x.LibraryId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TrainingPaths",
                 columns: table => new
                 {
@@ -65,7 +77,7 @@ namespace Pawgress.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProgressData = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProgressData = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -80,13 +92,14 @@ namespace Pawgress.Migrations
                 {
                     LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Video = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Link = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Tag = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TrainingPathId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Video = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tag = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TrainingPathId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LibraryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -97,11 +110,15 @@ namespace Pawgress.Migrations
                         principalTable: "Folders",
                         principalColumn: "FolderId");
                     table.ForeignKey(
+                        name: "FK_Lessons_Libraries_LibraryId",
+                        column: x => x.LibraryId,
+                        principalTable: "Libraries",
+                        principalColumn: "LibraryId");
+                    table.ForeignKey(
                         name: "FK_Lessons_TrainingPaths_TrainingPathId",
                         column: x => x.TrainingPathId,
                         principalTable: "TrainingPaths",
-                        principalColumn: "TrainingPathId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TrainingPathId");
                 });
 
             migrationBuilder.CreateTable(
@@ -109,11 +126,12 @@ namespace Pawgress.Migrations
                 columns: table => new
                 {
                     QuizId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TrainingPathId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     QuizName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MaxScore = table.Column<int>(type: "int", nullable: false),
-                    AchievedScore = table.Column<int>(type: "int", nullable: false),
-                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    MaxScore = table.Column<int>(type: "int", nullable: true),
+                    AchievedScore = table.Column<int>(type: "int", nullable: true),
+                    TrainingPathId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FolderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LibraryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -124,11 +142,15 @@ namespace Pawgress.Migrations
                         principalTable: "Folders",
                         principalColumn: "FolderId");
                     table.ForeignKey(
+                        name: "FK_Quizzes_Libraries_LibraryId",
+                        column: x => x.LibraryId,
+                        principalTable: "Libraries",
+                        principalColumn: "LibraryId");
+                    table.ForeignKey(
                         name: "FK_Quizzes_TrainingPaths_TrainingPathId",
                         column: x => x.TrainingPathId,
                         principalTable: "TrainingPaths",
-                        principalColumn: "TrainingPathId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TrainingPathId");
                 });
 
             migrationBuilder.CreateTable(
@@ -191,10 +213,10 @@ namespace Pawgress.Migrations
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TrainingPathId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Progress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Progress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -224,6 +246,11 @@ namespace Pawgress.Migrations
                 column: "FolderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Lessons_LibraryId",
+                table: "Lessons",
+                column: "LibraryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Lessons_TrainingPathId",
                 table: "Lessons",
                 column: "TrainingPathId");
@@ -242,6 +269,11 @@ namespace Pawgress.Migrations
                 name: "IX_Quizzes_FolderId",
                 table: "Quizzes",
                 column: "FolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quizzes_LibraryId",
+                table: "Quizzes",
+                column: "LibraryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Quizzes_TrainingPathId",
@@ -279,6 +311,9 @@ namespace Pawgress.Migrations
 
             migrationBuilder.DropTable(
                 name: "Folders");
+
+            migrationBuilder.DropTable(
+                name: "Libraries");
 
             migrationBuilder.DropTable(
                 name: "DogProfiles");

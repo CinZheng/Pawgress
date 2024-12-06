@@ -230,7 +230,6 @@ namespace Pawgress.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProgressData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -275,18 +274,16 @@ namespace Pawgress.Migrations
                     b.Property<Guid>("TrainingPathId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CompletionDate")
+                    b.Property<DateTime?>("CompletionDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Progress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "TrainingPathId");

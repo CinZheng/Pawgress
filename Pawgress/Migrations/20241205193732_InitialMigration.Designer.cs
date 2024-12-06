@@ -12,8 +12,8 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241205183118_updatedDb")]
-    partial class updatedDb
+    [Migration("20241205193732_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -233,7 +233,6 @@ namespace Pawgress.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProgressData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -278,18 +277,16 @@ namespace Pawgress.Migrations
                     b.Property<Guid>("TrainingPathId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CompletionDate")
+                    b.Property<DateTime?>("CompletionDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Progress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "TrainingPathId");

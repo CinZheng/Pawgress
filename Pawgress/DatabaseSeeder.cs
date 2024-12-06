@@ -35,7 +35,10 @@ public class DatabaseSeeder
                 new User { UserId = UserId4, Username = "User4", Email = "user4@example.com", Role = "User", PasswordHash = "hashedpassword" },
                 new User { UserId = UserId5, Username = "User5", Email = "user5@example.com", Role = "User", PasswordHash = "hashedpassword" }
             );
+            context.SaveChanges();
         }
+
+        
 
         // seed doggies
         if (!context.DogProfiles.Any())
@@ -47,6 +50,7 @@ public class DatabaseSeeder
                 new DogProfile { DogProfileId = DogId4, Name = "Danu", Breed = "Duitse Herder", DateOfBirth = new DateTime(2023, 1, 7) },
                 new DogProfile { DogProfileId = DogId5, Name = "Boris", Breed = "Labrador/ Golden Retriever", DateOfBirth = new DateTime(2023, 04, 19) }
             );
+            context.SaveChanges();
         }
 
         // seed trajecten
@@ -57,6 +61,7 @@ public class DatabaseSeeder
                 new TrainingPath { TrainingPathId = TrainingPathId2, Name = "Traject 2", Description = "Omschrijving van traject 2." },
                 new TrainingPath { TrainingPathId = TrainingPathId3, Name = "Traject 3", Description = "Omschrijving van traject 3." }
             );
+            context.SaveChanges();
         }
 
         // seed lessons
@@ -69,6 +74,7 @@ public class DatabaseSeeder
                 new Lesson { LessonId = Guid.NewGuid(), Name = "Les 4: Richtingcommando's", TrainingPathId = TrainingPathId2 },
                 new Lesson { LessonId = Guid.NewGuid(), Name = "Les 5: Stoppen voor stoepen", TrainingPathId = TrainingPathId2 }
             );
+            context.SaveChanges();
         }
 
         // seed quizzes
@@ -79,6 +85,7 @@ public class DatabaseSeeder
                 new Quiz { QuizId = Guid.NewGuid(), QuizName = "Quiz 2", TrainingPathId = TrainingPathId1 },
                 new Quiz { QuizId = Guid.NewGuid(), QuizName = "Quiz 3", TrainingPathId = TrainingPathId2 }
             );
+            context.SaveChanges();
         }
 
         // seed folders
@@ -90,6 +97,7 @@ public class DatabaseSeeder
                 new Folder { FolderId = Guid.NewGuid(), Name = "Folder 3", Description = "Lege folder 3", ParentFolderId = null },
                 new Folder { FolderId = Guid.NewGuid(), Name = "Folder 4", Description = "Lege folder 4", ParentFolderId = null }
             );
+            context.SaveChanges();
         }
 
         // seed notes
@@ -99,6 +107,7 @@ public class DatabaseSeeder
                 new Note { NoteId = Guid.NewGuid(), DogProfileId = DogId1, UserId = UserId1, Tag = "Gezondheid", Date = DateTime.Now, Description = "Gezondheidscontrole uitgevoerd." },
                 new Note { NoteId = Guid.NewGuid(), DogProfileId = DogId2, UserId = UserId2, Tag = "Gedrag", Date = DateTime.Now.AddDays(-10), Description = "Verbeterd gedrag opgemerkt." }
             );
+            context.SaveChanges();
         }
 
         // seed user - dogprofile relation
@@ -108,6 +117,7 @@ public class DatabaseSeeder
                 new User_DogProfile { UserId = UserId1, DogProfileId = DogId1, StartDate = DateTime.Now.AddMonths(-6), EndDate = DateTime.Now },
                 new User_DogProfile { UserId = UserId2, DogProfileId = DogId2, StartDate = DateTime.Now.AddYears(-1), EndDate = DateTime.Now.AddMonths(-3) }
             );
+            context.SaveChanges();
         }
 
         // seed user - trainingpath relation 
@@ -117,6 +127,7 @@ public class DatabaseSeeder
                 new User_TrainingPath { UserId = UserId1, TrainingPathId = TrainingPathId1, Progress = "50%", Status = "Active", StartDate = DateTime.Now.AddMonths(-2), CompletionDate = DateTime.MinValue },
                 new User_TrainingPath { UserId = UserId2, TrainingPathId = TrainingPathId2, Progress = "30%", Status = "Active", StartDate = DateTime.Now.AddMonths(-1), CompletionDate = DateTime.MinValue }
             );
+            context.SaveChanges();
         }
 
         // 1 bilbiotheek
@@ -131,6 +142,7 @@ public class DatabaseSeeder
                     Quizzes = new List<Quiz>(),   // Leeg voor nu
                 }
             );
+            context.SaveChanges();
         }
 
         context.SaveChanges();
