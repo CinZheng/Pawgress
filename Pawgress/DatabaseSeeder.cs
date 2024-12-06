@@ -144,7 +144,7 @@ public class DatabaseSeeder
             );
             context.SaveChanges();
         }
-
         context.SaveChanges();
+        Console.WriteLine("Seeding complete!");
     }
 }

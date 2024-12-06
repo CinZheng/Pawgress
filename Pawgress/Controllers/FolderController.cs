@@ -4,12 +4,12 @@ using Pawgress.Data;
 
 [ApiController]
 [Route("api/[controller]")]
-public class FolderController : ControllerBase 
+public class FolderController : Controller
 {
     private readonly ApplicationDbContext _context;
 
     public FolderController(ApplicationDbContext context) {
-        _context = context; // dependency injected
+        _context = context;
     }
 
     // GET: api/Folder/test
