@@ -21,12 +21,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// seeding db
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    DatabaseSeeder.Seed(context);
-}
+// // seeding db
+// using (var scope = app.Services.CreateScope())
+// {
+//     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//     DatabaseSeeder.Seed(context);
+// }
 
 app.UseAuthorization();
 app.MapControllers();

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "xESG6+zwsF+IQY4xYWdORrIWmpRe4+gg+cmBO0Eg5SMrFE95oxEPTowH53h0ljr/fNf+3HP7TSHV3XOXyPpVTA==",
+  "dgSpecHash": "6qh63TlNSSbx2NQ+tbrzdkxmXERh05cTjl7w0HfNYt57Y/PVKO/8a8q4ntKrEXC45Y2CvaS7Zfzyn+ioihJyvA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Cindy\\Documents\\GitHub\\Pawgress\\Pawgress\\Pawgress.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Cindy\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Cindy\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
+    "C:\\Users\\Cindy\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Cindy\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Cindy\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.5\\microsoft.aspnetcore.openapi.7.0.5.nupkg.sha512",
     "C:\\Users\\Cindy\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\1.1.1\\microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
