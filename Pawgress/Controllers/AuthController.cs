@@ -37,4 +37,33 @@ public class AuthController : Controller
 
         return Ok("Account succesvol aangemaakt!");
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginDto loginDto)
+    {
+        // searchuser by email
+        var user = _context.Users.FirstOrDefault(u => u.Email == loginDto.Email);
+        if (user == null)
+        {
+            return Unauthorized("Ongeldige inloggegevens.");
+        }
+
+        // check password
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+        if (!isPasswordValid)
+        {
+            return Unauthorized("Ongeldige inloggegevens.");
+        }
+
+        // login success
+        return Ok(new
+        {
+            Message = "Succesvol ingelogd!",
+            UserId = user.UserId,
+            Username = user.Username,
+            Email = user.Email,
+            Role = user.Role
+        });
+    }
+
 }
