@@ -1,5 +1,9 @@
+using Pawgress.Configurations;
 using Pawgress.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +12,11 @@ builder.Services.AddControllers();
 // configure dbcontext
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// swagger configuratie
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// configure jsonwebtoken
+builder.Services.ConfigureJwt(builder.Configuration);
+
+// configure swagger using the extension
+builder.Services.ConfigureSwagger();
 
 var app = builder.Build();
 
@@ -21,6 +27,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// authenticatie en authorizatie
+app.UseAuthentication();
+app.UseAuthorization();
+
 // // seeding db
 // using (var scope = app.Services.CreateScope())
 // {
@@ -28,6 +38,5 @@ if (app.Environment.IsDevelopment())
 //     DatabaseSeeder.Seed(context);
 // }
 
-app.UseAuthorization();
 app.MapControllers();
 app.Run();
