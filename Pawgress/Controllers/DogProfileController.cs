@@ -1,22 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
-using Pawgress.Data;
+using Pawgress.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class DogProfileController : Controller
+namespace Pawgress.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public DogProfileController(ApplicationDbContext context)
+    public class DogProfileController : BaseController<DogProfile>
     {
-        _context = context;
-    }
-
-    [HttpGet]
-    public IActionResult GetAllDogProfiles()
-    {
-        var dogProfiles = _context.DogProfiles.ToList();
-        return Ok(dogProfiles);
+        public DogProfileController(DogProfileService service) : base(service)
+        {
+        }
     }
 }

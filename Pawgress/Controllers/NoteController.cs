@@ -1,22 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
-using Pawgress.Data;
+using Pawgress.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class NoteController : Controller
+namespace Pawgress.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public NoteController(ApplicationDbContext context)
+    public class NoteController : BaseController<Note>
     {
-        _context = context;
-    }
-
-    [HttpGet]
-    public IActionResult GetAllNotes()
-    {
-        var notes = _context.Notes.ToList();
-        return Ok(notes);
+        public NoteController(NoteService service) : base(service)
+        {
+        }
     }
 }

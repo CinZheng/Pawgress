@@ -1,22 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
-using Pawgress.Data;
+using Pawgress.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class LessonController : Controller
+namespace Pawgress.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public LessonController(ApplicationDbContext context)
+    public class LessonController : BaseController<Lesson>
     {
-        _context = context;
-    }
-
-    [HttpGet]
-    public IActionResult GetAllLessons()
-    {
-        var lessons = _context.Lessons.ToList();
-        return Ok(lessons);
+        public LessonController(LessonService service) : base(service)
+        {
+        }
     }
 }
