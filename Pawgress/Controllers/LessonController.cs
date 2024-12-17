@@ -5,7 +5,7 @@ namespace Pawgress.Controllers
 {
     public class LessonController : BaseController<Lesson>
     {
-        public LessonController(LessonService service) : base(service)
+        public LessonController(BaseService<Lesson> service) : base(service)
         {
         }
     }

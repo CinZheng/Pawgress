@@ -1,22 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
-using Pawgress.Data;
+using Pawgress.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class LibraryController : Controller
+namespace Pawgress.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public LibraryController(ApplicationDbContext context)
+    public class LibraryController : BaseController<Library>
     {
-        _context = context;
-    }
-
-    [HttpGet]
-    public IActionResult GetAllLibraries()
-    {
-        var libraries = _context.Libraries.ToList();
-        return Ok(libraries);
+        public LibraryController(BaseService<Library> service) : base(service)
+        {
+        }
     }
 }

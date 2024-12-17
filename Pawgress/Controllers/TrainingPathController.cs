@@ -1,22 +1,50 @@
 using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
-using Pawgress.Data;
+using Pawgress.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class TrainingPathController : Controller
+namespace Pawgress.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public TrainingPathController(ApplicationDbContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TrainingPathController : Controller
     {
-        _context = context;
-    }
+        private readonly TrainingPathService _service;
 
-    [HttpGet]
-    public IActionResult GetAllTrainingPaths()
-    {
-        var trainingPaths = _context.TrainingPaths.ToList();
-        return Ok(trainingPaths);
+        public TrainingPathController(TrainingPathService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            return Ok(_service.GetAll());
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(Guid id)
+        {
+            var path = _service.GetById(id);
+            return path == null ? NotFound("Niet gevonden.") : Ok(path);
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] TrainingPath path)
+        {
+            return Ok(_service.Create(path));
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(Guid id, [FromBody] TrainingPath path)
+        {
+            var result = _service.Update(id, path);
+            return result == null ? NotFound("Niet gevonden.") : Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            return _service.Delete(id) ? Ok("Succesvol verwijderd.") : NotFound("Niet gevonden.");
+        }
     }
 }

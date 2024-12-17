@@ -1,22 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
-using Pawgress.Data;
+using Pawgress.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class QuizController : Controller
+namespace Pawgress.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public QuizController(ApplicationDbContext context)
+    public class QuizController : BaseController<Quiz>
     {
-        _context = context;
-    }
-
-    [HttpGet]
-    public IActionResult GetAllQuizs()
-    {
-        var quizzes = _context.Quizzes.ToList();
-        return Ok(quizzes);
+        public QuizController(BaseService<Quiz> service) : base(service)
+        {
+        }
     }
 }

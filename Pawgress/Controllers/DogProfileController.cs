@@ -5,7 +5,7 @@ namespace Pawgress.Controllers
 {
     public class DogProfileController : BaseController<DogProfile>
     {
-        public DogProfileController(DogProfileService service) : base(service)
+        public DogProfileController(BaseService<DogProfile> service) : base(service)
         {
         }
     }
