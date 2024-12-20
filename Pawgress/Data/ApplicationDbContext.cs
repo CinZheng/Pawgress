@@ -9,9 +9,11 @@ namespace Pawgress.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<DogProfile> DogProfiles { get; set; }
+        public DbSet<DogSensorData> DogSensorData { get; set; }
         public DbSet<TrainingPath> TrainingPaths { get; set; }
         public DbSet<Note> Notes { get; set; }
         public DbSet<Quiz> Quizzes { get; set; }
+        public DbSet<QuizAnswer> QuizAnswers { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Library> Libraries { get; set; }

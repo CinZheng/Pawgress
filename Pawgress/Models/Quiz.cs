@@ -11,5 +11,7 @@ namespace Pawgress.Models
         public int? AchievedScore { get; set; }
         public Guid? TrainingPathId { get; set; }
         public TrainingPath? TrainingPath { get; set; }
+        public List<QuizAnswer>? Questions { get; set; } = new List<QuizAnswer>();
+
     }
 }

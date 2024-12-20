@@ -5,28 +5,46 @@ using Pawgress.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// config services
-builder.Services.RegisterServices();
+// Controleer of dit een migratiecontext is
+var isMigration = args.Contains("--migration");
 
-// configure dbcontext
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+if (!isMigration)
+{
+    // Config services
+    builder.Services.RegisterServices();
 
-// configure jsonwebtoken
-builder.Services.ConfigureJwt(builder.Configuration);
+    // Configure JSON Web Tokens
+    builder.Services.ConfigureJwt(builder.Configuration);
 
-// configure swagger using the extension
-builder.Services.ConfigureSwagger();
+    // Configure Swagger alleen tijdens runtime
+    if (builder.Environment.IsDevelopment())
+    {
+        Console.WriteLine("Configuring Swagger...");
+        builder.Services.ConfigureSwagger();
+    }
+}
+else
+{
+    Console.WriteLine("Skipping Swagger configuration...");
+}
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
+builder.Services.AddControllers();
+
+// Configure DbContext altijd (voor migraties en runtime)
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// swagger middleware
-if (app.Environment.IsDevelopment())
+// Swagger middleware alleen als geen migratie
+if (!isMigration && app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// authenticatie en authorizatie
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -39,3 +57,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
+
+
+
+

@@ -1,16 +1,24 @@
-using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 
 namespace Pawgress.Configurations
 {
     public static class SwaggerConfig
     {
-        public static void ConfigureSwagger(this IServiceCollection services)
+        public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
-            services.AddSwaggerGen(options =>
+            services.AddSwaggerGen(c =>
             {
-                // voegt jwt authenticatie ondersteuning toe aan Swagger
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                // basisinformatie swagger
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Pawgress API",
+                    Version = "v1",
+                    Description = "API documentatie voor Pawgress applicatie"
+                });
+
+                // JWT authenticatie
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.Http,
@@ -20,7 +28,7 @@ namespace Pawgress.Configurations
                     Description = "Voer je JWT-token in!"
                 });
 
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
@@ -35,6 +43,8 @@ namespace Pawgress.Configurations
                     }
                 });
             });
+
+            return services;
         }
     }
 }
