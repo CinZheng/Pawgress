@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawgress.Data;
 
@@ -11,9 +12,11 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241221175037_AddQuizQuestionRelationss")]
+    partial class AddQuizQuestionRelationss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -417,11 +420,13 @@ namespace Pawgress.Migrations
 
             modelBuilder.Entity("Pawgress.Models.QuizQuestion", b =>
                 {
-                    b.HasOne("Pawgress.Models.Quiz", null)
+                    b.HasOne("Pawgress.Models.Quiz", "Quiz")
                         .WithMany("QuizQuestions")
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Quiz");
                 });
 
             modelBuilder.Entity("Pawgress.Models.User_DogProfile", b =>

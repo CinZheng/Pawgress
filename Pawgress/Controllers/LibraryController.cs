@@ -7,6 +7,9 @@ namespace Pawgress.Controllers
     {
         public LibraryController(BaseService<Library> service) : base(service)
         {
+            
         }
+
+        
     }
 }

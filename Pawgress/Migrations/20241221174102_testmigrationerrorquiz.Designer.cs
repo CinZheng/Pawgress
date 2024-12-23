@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawgress.Data;
 
@@ -11,9 +12,11 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241221174102_testmigrationerrorquiz")]
+    partial class testmigrationerrorquiz
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,7 +236,6 @@ namespace Pawgress.Migrations
             modelBuilder.Entity("Pawgress.Models.QuizQuestion", b =>
                 {
                     b.Property<Guid>("QuizQuestionId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CorrectAnswer")
@@ -245,12 +247,7 @@ namespace Pawgress.Migrations
                     b.Property<string>("QuestionText")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("QuizId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("QuizQuestionId");
-
-                    b.HasIndex("QuizId");
 
                     b.ToTable("Questions");
                 });
@@ -419,7 +416,7 @@ namespace Pawgress.Migrations
                 {
                     b.HasOne("Pawgress.Models.Quiz", null)
                         .WithMany("QuizQuestions")
-                        .HasForeignKey("QuizId")
+                        .HasForeignKey("QuizQuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -9,7 +9,7 @@ namespace Pawgress.Models
         public string? Text { get; set; }
         public string? Video { get; set; }
         public string? Image { get; set; }
-        public string? Link { get; set; }
+        public string? MediaUrl { get; set; }
         public string? Tag { get; set; }
         public string? MarkdownContent { get; set; }
         public Guid? TrainingPathId { get; set; }

@@ -5,7 +5,7 @@ using Pawgress.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controleer of dit een migratiecontext is
+// 
 var isMigration = args.Contains("--migration");
 
 if (!isMigration)
@@ -35,6 +35,17 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configureer CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Swagger middleware alleen als geen migratie
@@ -43,6 +54,15 @@ if (!isMigration && app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request Path: {context.Request.Path}");
+    await next.Invoke();
+});
+
+// Gebruik de CORS-policy
+app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

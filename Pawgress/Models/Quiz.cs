@@ -7,11 +7,10 @@ namespace Pawgress.Models
     {
         public Guid QuizId { get; set; }
         public string QuizName { get; set; }
-        public int? MaxScore { get; set; }
-        public int? AchievedScore { get; set; }
+        public string QuizDescription { get; set; }
         public Guid? TrainingPathId { get; set; }
         public TrainingPath? TrainingPath { get; set; }
-        public List<QuizAnswer>? Questions { get; set; } = new List<QuizAnswer>();
+        public List<QuizQuestion>? QuizQuestions { get; set; } = new List<QuizQuestion>();
 
     }
 }

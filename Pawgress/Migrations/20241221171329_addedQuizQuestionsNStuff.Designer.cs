@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawgress.Data;
 
@@ -11,9 +12,11 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241221171329_addedQuizQuestionsNStuff")]
+    partial class addedQuizQuestionsNStuff
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,14 +248,14 @@ namespace Pawgress.Migrations
                     b.Property<string>("QuestionText")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("QuizId")
+                    b.Property<Guid?>("QuizId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("QuizQuestionId");
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("QuizQuestions");
                 });
 
             modelBuilder.Entity("Pawgress.Models.TrainingPath", b =>
@@ -419,9 +422,7 @@ namespace Pawgress.Migrations
                 {
                     b.HasOne("Pawgress.Models.Quiz", null)
                         .WithMany("QuizQuestions")
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuizId");
                 });
 
             modelBuilder.Entity("Pawgress.Models.User_DogProfile", b =>

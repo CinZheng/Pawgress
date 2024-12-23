@@ -18,6 +18,7 @@ namespace Pawgress.Extensions
             services.AddScoped<TrainingPathService>();
             services.AddScoped<NoteService>();
             services.AddScoped<FolderService>();
+            services.AddScoped<QuizService>();
 
             return services;
         }
