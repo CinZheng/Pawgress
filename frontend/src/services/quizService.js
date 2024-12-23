@@ -1,4 +1,4 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from '../axios';
 
 export const addQuestion = (quizId, question) =>
   axiosInstance.post(`/api/Quiz/add-question`, { ...question, quizId });

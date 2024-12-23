@@ -13,7 +13,7 @@ function Navbar() {
 
   const navigationItems = [
     { label: "Modules", icon: <HomeIcon />, path: "/modules" },
-    { label: "Honden", icon: <PetsIcon />, path: "/dogs" },
+    { label: "Honden", icon: <PetsIcon />, path: "/dogprofiles" },
     { label: "Bibliotheek", icon: <LibraryBooksIcon />, path: "/library" },
     { label: "Profiel", icon: <AccountCircleIcon />, path: "/profile" },
   ];
