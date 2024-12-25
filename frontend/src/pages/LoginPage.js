@@ -3,7 +3,7 @@ import axiosInstance from "../axios";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => { // onLogin toegevoegd als prop
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -19,9 +19,14 @@ const LoginPage = () => {
       const { token, userId } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
+      //console.log("login: " + localStorage.getItem("token"));
+
       setMessage("Inloggen succesvol!");
 
-       // Redirect naar profielpagina
+      // Update inlogstatus in App.js
+      onLogin(); // Callback om de inlogstatus bij te werken
+
+      // Redirect naar profielpagina
       navigate("/profile");
     } catch (error) {
       console.error("Inlogfout:", error);

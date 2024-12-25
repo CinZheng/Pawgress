@@ -38,7 +38,7 @@ public class DatabaseSeeder
             context.SaveChanges();
         }
 
-        
+
 
         // seed doggies
         if (!context.DogProfiles.Any())

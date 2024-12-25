@@ -98,6 +98,12 @@ public class AuthController : Controller
             new Claim(ClaimTypes.Role, user.Role)
         };
 
+        Console.WriteLine("Claims toegevoegd aan token:");
+        foreach (var claim in claims)
+        {
+            Console.WriteLine($"{claim.Type}: {claim.Value}");
+        }
+
         // key
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])); // lees uit appsettings
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

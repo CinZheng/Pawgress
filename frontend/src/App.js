@@ -1,7 +1,7 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import QuizEditorPage from "./pages/QuizEditorPage";
+import LessonEditorPage from "./pages/LessonEditorPage";
 import Navbar from "./components/Navbar";
 import ModuleOverviewPage from "./pages/ModuleOverviewPage";
 import ModuleDetailsPage from "./pages/ModuleDetailsPage";
@@ -10,18 +10,25 @@ import DogprofileDetailsPage from "./pages/DogProfileDetailsPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-import { isAuthenticated } from "./utils/auth";
 import PrivateRoute from "./components/PrivateRoute";
+import LibraryPage from "./pages/LibraryPage";
+import { isAuthenticated } from "./utils/auth";
+import { isAdmin } from "./utils/auth";
 
 function App() {
-  const isLoggedIn = isAuthenticated();
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+
+  // Controleer de loginstatus opnieuw wanneer de component mount
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
 
   return (
     <Router>
-      {isLoggedIn && <Navbar />}
+      <NavbarWrapper isLoggedIn={isLoggedIn} />
       <Routes>
         {/* Openbare routes */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Beveiligde routes */}
@@ -29,7 +36,7 @@ function App() {
           path="/library"
           element={
             <PrivateRoute>
-              <div>Bibliotheek Pagina</div>
+              <LibraryPage />
             </PrivateRoute>
           }
         />
@@ -73,10 +80,44 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* Beveiligde routes alleen voor admins */}
+        <Route
+          path="/quiz-editor"
+          element={
+            <PrivateRoute>
+              {isAdmin() ? (
+                <QuizEditorPage />
+              ) : (
+                <div>U heeft geen toegang tot deze pagina.</div>
+              )}
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lesson-editor"
+          element={
+            <PrivateRoute>
+              {isAdmin() ? (
+                <LessonEditorPage />
+              ) : (
+                <div>U heeft geen toegang tot deze pagina.</div>
+              )}
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );
 }
 
-export default App;
+const NavbarWrapper = ({ isLoggedIn }) => {
+  const location = useLocation(); // gebruik de hook binnen Router-context
+  const hideNavbarRoutes = ["/login", "/register"];
+  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
+  if (!isLoggedIn || shouldHideNavbar) return null; // verberg Navbar op specifieke routes of als niet ingelogd
+
+  return <Navbar />;
+};
+
+export default App;
