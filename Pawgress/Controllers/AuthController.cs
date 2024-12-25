@@ -27,7 +27,7 @@ public class AuthController : Controller
         // check if user exists
         if (_context.Users.Any(u => u.Email == registerDto.Email))
         {
-            return BadRequest("Email is al in gebruik ):");
+            return BadRequest("Email is al in gebruik.");
         }
 
         // add new user
@@ -43,7 +43,7 @@ public class AuthController : Controller
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok("Account succesvol aangemaakt!");
+        return Ok("Account succesvol aangemaakt! U kunt nu inloggen.");
     }
 
     [HttpPost("login")]

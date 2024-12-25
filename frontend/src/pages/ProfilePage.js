@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../axios";
 import { Typography, Button, Avatar, Container } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate(); // Navigeren tussen pagina's
 
   useEffect(() => {
     // haal userId uit JWT-token
@@ -13,7 +15,7 @@ const ProfilePage = () => {
       return;
     }
 
-    //ophalen gebruiker
+    // ophalen gebruiker
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get(`/api/User/${userId}`);
@@ -25,6 +27,13 @@ const ProfilePage = () => {
 
     fetchUser();
   }, []);
+
+  // uitlog functie
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId"); 
+    navigate("/login"); 
+  };
 
   if (!user) return <Typography>Profiel wordt geladen...</Typography>;
 
@@ -44,6 +53,12 @@ const ProfilePage = () => {
         onClick={() => alert("Bewerk profiel functionaliteit komt eraan!")}
       >
         Bewerk profiel
+      </Button>
+      {/* Uitlogknop */}
+      <Button
+        onClick={handleLogout}
+      >
+        Uitloggen
       </Button>
     </Container>
   );
