@@ -22,22 +22,19 @@ const LibraryPage = () => {
             color="primary"
             onClick={() => navigate("/quiz-editor")}
           >
-            Quiz Editor
+            Beheer Quizzes
           </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate("/lesson-editor")}
+            onClick={() => navigate("/lessons")}
           >
-            Lesson Editor
+            Beheer Lessen
           </Button>
         </div>
       )}
     </Container>
   );
 };
-
-console.log("admin?:" + isAdmin());
-console.log(localStorage.getItem("token"))
 
 export default LibraryPage;

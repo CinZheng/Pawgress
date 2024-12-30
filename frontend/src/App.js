@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import QuizEditorPage from "./pages/QuizEditorPage";
 import LessonEditorPage from "./pages/LessonEditorPage";
+import LessonOverviewPage from "./pages/LessonOverviewPage";
 import Navbar from "./components/Navbar";
 import ModuleOverviewPage from "./pages/ModuleOverviewPage";
 import ModuleDetailsPage from "./pages/ModuleDetailsPage";
@@ -77,6 +78,14 @@ function App() {
           element={
             <PrivateRoute>
               <DogprofileDetailsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lessons"
+          element={
+            <PrivateRoute>
+              <LessonOverviewPage />
             </PrivateRoute>
           }
         />
