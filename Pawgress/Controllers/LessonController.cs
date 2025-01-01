@@ -13,14 +13,11 @@ namespace Pawgress.Controllers
             _lessonService = service;
         }
 
-        [HttpPost("add-markdown")]
+        /*[HttpPost("add-markdown")]
         public IActionResult CreateLessonWithMarkdown([FromBody] Lesson lesson)
         {
-            // valideren of gebruiker beheerder is
-            //if (!User.IsInRole("Admin")) return Forbid("Alleen beheerders mogen lessen aanmaken");
-
             var createdLesson = _lessonService.Create(lesson);
             return Ok(createdLesson);
-        }
+        }*/
     }
 }

@@ -36,11 +36,19 @@ namespace Pawgress.Services
             var existingEntity = _dbSet.Find(id);
             if (existingEntity == null) return null;
 
-            // Zorg dat EF Core weet dat de entiteit is gewijzigd
-            _context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
+            // voorkomt wijzigingen aan de primary key
+            foreach (var property in _context.Entry(updatedEntity).Properties)
+            {
+                if (property.Metadata.IsPrimaryKey())
+                {
+                    continue; // sla primary key properties over
+                }
+                _context.Entry(existingEntity).Property(property.Metadata.Name).CurrentValue = property.CurrentValue;
+            }
+
+            // markeer de entity als gewijzigd
             _context.Entry(existingEntity).State = EntityState.Modified;
 
-            // Opslaan van wijzigingen
             _context.SaveChanges();
             return existingEntity;
         }

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 import QuizEditorPage from "./pages/QuizEditorPage";
 import LessonEditorPage from "./pages/LessonEditorPage";
 import LessonOverviewPage from "./pages/LessonOverviewPage";
+import LessonDetailsPage from "./pages/LessonDetailsPage";
 import Navbar from "./components/Navbar";
 import ModuleOverviewPage from "./pages/ModuleOverviewPage";
 import ModuleDetailsPage from "./pages/ModuleDetailsPage";
@@ -86,6 +87,14 @@ function App() {
           element={
             <PrivateRoute>
               <LessonOverviewPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lessons/:id"
+          element={
+            <PrivateRoute>
+              <LessonDetailsPage />
             </PrivateRoute>
           }
         />

@@ -1,22 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill"; // rich text
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axiosInstance from "../axios";
+import { marked } from "marked";
 
 const LessonEditorPage = () => {
   const [formData, setFormData] = useState({
     name: "",
-    text: "",
+    markdownContent: "",
     image: "",
     video: "",
     tag: "",
-    markdownContent: "",
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const lessonId = searchParams.get("id");
+
+  // fetch lesson details if editing an existing lesson
+  useEffect(() => {
+    const fetchLesson = async () => {
+      if (lessonId) {
+        try {
+          const response = await axiosInstance.get(`/api/Lesson/${lessonId}`);
+          setFormData({
+            name: response.data.name || "",
+            markdownContent: response.data.markdownContent || "",
+            image: response.data.image || "",
+            video: response.data.video || "",
+            tag: response.data.tag || "",
+          });
+        } catch (error) {
+          console.error("Error fetching lesson:", error);
+        }
+      }
+    };
+
+    fetchLesson();
+  }, [lessonId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,19 +62,18 @@ const LessonEditorPage = () => {
     }
 
     try {
-      const response = await axiosInstance.post("/api/Lesson", formData);
-      setMessage("De les is succesvol toegevoegd!");
-      // Reset formulier
-      setFormData({
-        name: "",
-        text: "",
-        image: "",
-        video: "",
-        tag: "",
-        markdownContent: "",
-      });
+      if (lessonId) {
+        // update existing lesson
+        await axiosInstance.put(`/api/Lesson/${lessonId}`, formData);
+        setMessage("De les is succesvol bijgewerkt!");
+      } else {
+        // create new lesson
+        await axiosInstance.post("/api/Lesson", formData);
+        setMessage("De les is succesvol toegevoegd!");
+      }
+      navigate("/lessons");
     } catch (err) {
-      setError("Er is iets fout gegaan bij het toevoegen van de les.");
+      setError("Er is iets fout gegaan bij het opslaan van de les.");
       console.error(err);
     }
   };
@@ -58,10 +81,9 @@ const LessonEditorPage = () => {
   return (
     <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>
-        Les Toevoegen
+        {lessonId ? "Les Bewerken" : "Nieuwe Les Toevoegen"}
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        {/* Titel */}
         <TextField
           label="Titel"
           name="name"
@@ -70,19 +92,8 @@ const LessonEditorPage = () => {
           value={formData.name}
           onChange={handleInputChange}
         />
-
-        {/* Tekst */}
-        <TextField
-          label="Tekst"
-          name="text"
-          variant="outlined"
-          multiline
-          rows={4}
-          value={formData.text}
-          onChange={handleInputChange}
-        />
-
-        {/* Afbeelding */}
+        <Typography variant="h6">Markdown Content</Typography>
+        <ReactQuill theme="snow" value={formData.markdownContent} onChange={handleMarkdownChange} />
         <TextField
           label="Afbeelding URL"
           name="image"
@@ -90,8 +101,6 @@ const LessonEditorPage = () => {
           value={formData.image}
           onChange={handleInputChange}
         />
-
-        {/* Video */}
         <TextField
           label="Video URL"
           name="video"
@@ -99,8 +108,6 @@ const LessonEditorPage = () => {
           value={formData.video}
           onChange={handleInputChange}
         />
-
-        {/* Tags */}
         <TextField
           label="Tags"
           name="tag"
@@ -108,12 +115,6 @@ const LessonEditorPage = () => {
           value={formData.tag}
           onChange={handleInputChange}
         />
-
-        {/* Markdown Content */}
-        <Typography variant="h6">Markdown Content</Typography>
-        <ReactQuill theme="snow" value={formData.markdownContent} onChange={handleMarkdownChange} />
-
-        {/* Preview */}
         <Typography variant="h5" gutterBottom>
           Preview
         </Typography>
@@ -126,7 +127,7 @@ const LessonEditorPage = () => {
           }}
         >
           <Typography variant="h6">{formData.name}</Typography>
-          <Typography variant="body1">{formData.text}</Typography>
+          <div dangerouslySetInnerHTML={{ __html: marked(formData.markdownContent || "") }}></div>
           {formData.image && <img src={formData.image} alt="Preview" style={{ maxWidth: "100%", marginTop: "8px" }} />}
           {formData.video && (
             <iframe
@@ -139,13 +140,9 @@ const LessonEditorPage = () => {
             {formData.tag}
           </Typography>
         </Box>
-
-        {/* Submit */}
         <Button type="submit" variant="contained" color="primary">
-          Voeg Les Toe
+          {lessonId ? "Bijwerken" : "Toevoegen"}
         </Button>
-
-        {/* Feedback */}
         {message && <Alert severity="success">{message}</Alert>}
         {error && <Alert severity="error">{error}</Alert>}
       </Box>
