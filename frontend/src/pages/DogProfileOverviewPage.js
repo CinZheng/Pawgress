@@ -22,12 +22,17 @@ const DogsPage = () => {
 
   return (
     <Grid container spacing={2} padding={2}>
+      <Grid item xs={12}>
+            <Typography variant="h4" gutterBottom>
+              Honden
+            </Typography>
+          </Grid>
       {dogs.map((dog) => (
         <Grid item xs={12} sm={6} md={4} key={dog.dogProfileId}>
           <Card
-            onClick={() => navigate(`/dogs/${dog.dogProfileId}`)}
+            onClick={() => navigate(`/dogprofiles/${dog.dogProfileId}`)}
             style={{ cursor: "pointer" }}
-          >
+          > 
             <CardContent>
               <Typography variant="h6">{dog.name}</Typography>
               <Typography variant="body2">Ras: {dog.breed}</Typography>

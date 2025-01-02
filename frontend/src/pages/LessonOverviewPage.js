@@ -25,14 +25,14 @@ const LessonOverviewPage = () => {
       <Typography variant="h4" gutterBottom>
         Overzicht van Lessen
       </Typography>
-      <Button
+      { /* <Button
         variant="contained"
         color="primary"
         style={{ marginBottom: "20px" }}
         onClick={() => navigate("/lesson-editor")}
       >
         Nieuwe Les Aanmaken
-      </Button>
+      </Button> */ }
       <Grid container spacing={2}>
         {lessons.map((lesson) => (
           <Grid item xs={12} sm={6} md={4} key={lesson.lessonId}>

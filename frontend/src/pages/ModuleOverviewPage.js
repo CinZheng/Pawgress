@@ -22,6 +22,11 @@ const ModulesPage = () => {
 
   return (
     <Grid container spacing={2} padding={2}>
+      <Grid item xs={12}>
+        <Typography variant="h4" gutterBottom>
+          Modules
+        </Typography>
+      </Grid>
       {modules.map((module) => (
         <Grid item xs={12} sm={6} md={4} key={module.trainingPathId}>
           <Card

@@ -2,24 +2,27 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../axios";
 import { Typography, Button, Avatar, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { isAdmin } from "../utils/auth";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate(); // Navigeren tussen pagina's
+  const [isUserAdmin, setIsUserAdmin] = useState(false); // Check of gebruiker admin is
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // haal userId uit JWT-token
-    const userId = localStorage.getItem("userId"); // Alternatief: JWT decoderen
+    // Haal userId uit JWT-token
+    const userId = localStorage.getItem("userId");
     if (!userId) {
       console.error("Geen userId gevonden.");
       return;
     }
 
-    // ophalen gebruiker
+    // Ophalen gebruiker
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get(`/api/User/${userId}`);
         setUser(response.data);
+        setIsUserAdmin(isAdmin()); // Controleer of de gebruiker admin is
       } catch (error) {
         console.error("Fout bij ophalen gebruiker:", error);
       }
@@ -28,11 +31,11 @@ const ProfilePage = () => {
     fetchUser();
   }, []);
 
-  // uitlog functie
+  // Uitlog functie
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userId"); 
-    navigate("/login"); 
+    localStorage.removeItem("userId");
+    navigate("/login");
   };
 
   if (!user) return <Typography>Profiel wordt geladen...</Typography>;
@@ -51,13 +54,11 @@ const ProfilePage = () => {
         variant="contained"
         color="primary"
         onClick={() => alert("Bewerk profiel functionaliteit komt eraan!")}
+        style={{ marginRight: "10px" }}
       >
         Bewerk profiel
       </Button>
-      {/* Uitlogknop */}
-      <Button
-        onClick={handleLogout}
-      >
+      <Button onClick={handleLogout} variant="outlined" color="secondary">
         Uitloggen
       </Button>
     </Container>

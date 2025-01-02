@@ -3,12 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { marked } from "marked";
 import axiosInstance from "../axios";
+import { isAdmin } from "../utils/auth";
 
 const LessonDetailsPage = () => {
   const { id } = useParams(); // lesson id van route
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // delete confirmation
+  const [isUserAdmin, setIsUserAdmin] = useState(false); // check of gebruiker admin is
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -21,13 +23,15 @@ const LessonDetailsPage = () => {
     };
 
     fetchLesson();
+
+    setIsUserAdmin(isAdmin());
   }, [id]);
 
   const handleDelete = async () => {
     try {
       await axiosInstance.delete(`/api/Lesson/${id}`);
-      setDeleteDialogOpen(false); 
-      navigate("/lessons"); 
+      setDeleteDialogOpen(false);
+      navigate("/lessons");
     } catch (error) {
       console.error("Error deleting lesson:", error);
     }
@@ -63,14 +67,17 @@ const LessonDetailsPage = () => {
           Tags: {lesson.tag || "Geen tags"}
         </Typography>
       </Box>
-      <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-        <Button variant="contained" color="primary" onClick={() => navigate(`/lesson-editor?id=${id}`)}>
-          Bewerken
-        </Button>
-        <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>
-          Verwijderen
-        </Button>
-      </Box>
+
+      {isUserAdmin && ( // Knoppen alleen zichtbaar als gebruiker admin is
+        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+          <Button variant="contained" color="primary" onClick={() => navigate(`/lesson-editor?id=${id}`)}>
+            Bewerken
+          </Button>
+          <Button variant="contained" color="error" onClick={() => setDeleteDialogOpen(true)}>
+            Verwijderen
+          </Button>
+        </Box>
+      )}
 
       {/* Confirmation Dialog for Delete */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
