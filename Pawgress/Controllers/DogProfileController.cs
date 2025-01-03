@@ -54,7 +54,7 @@ namespace Pawgress.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] DogProfileDto dogProfileDto)
         {
-             Console.WriteLine($"Image received: {dogProfileDto.Image}");
+            Console.WriteLine($"Image received: {dogProfileDto.Image}");
             var dogProfile = new DogProfile
             {
                 DogProfileId = Guid.NewGuid(),
@@ -88,6 +88,25 @@ namespace Pawgress.Controllers
 
             _service.Update(id, dogProfile);
             return Ok(dogProfileDto);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var dogProfile = _service.GetById(id);
+            if (dogProfile == null) return NotFound("Hondenprofiel niet gevonden.");
+
+            // Verwijder gekoppelde notities indien nodig
+            if (dogProfile.Notes != null && dogProfile.Notes.Any())
+            {
+                dogProfile.Notes.Clear();
+            }
+
+            // Verwijder het hondenprofiel
+            var result = _service.Delete(id);
+            if (!result) return BadRequest("Er is iets misgegaan bij het verwijderen.");
+
+            return Ok("Hondenprofiel succesvol verwijderd.");
         }
     }
 }

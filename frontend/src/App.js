@@ -161,12 +161,14 @@ function App() {
           path="/sensor-data-form" 
           element={
             <SensorDataForm />
-          } />
-          <Route 
+          } 
+        />
+        <Route 
           path="/sensor-data" 
           element={
             <SensorDataPage />
-          } />
+          }
+        />
       </Routes>
     </Router>
   );
