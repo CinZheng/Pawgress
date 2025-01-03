@@ -1,37 +1,105 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { Container, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import axiosInstance from "../axios";
-import { Typography, Container } from "@mui/material";
+import { isAdmin } from "../utils/auth";
 
-const DogDetailsPage = () => {
+const DogProfileDetailsPage = () => {
   const { id } = useParams();
-  const [dog, setDog] = useState(null);
+  const navigate = useNavigate();
+  const [dogProfile, setDogProfile] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
 
   useEffect(() => {
-    const fetchDogDetails = async () => {
+    const fetchDogProfile = async () => {
       try {
         const response = await axiosInstance.get(`/api/DogProfile/${id}`);
-        setDog(response.data);
+        setDogProfile(response.data);
       } catch (error) {
-        console.error("Fout bij ophalen hondenprofiel details:", error);
+        console.error("Fout bij ophalen hondenprofiel:", error);
       }
     };
 
-    fetchDogDetails();
+    fetchDogProfile();
+    setIsUserAdmin(isAdmin());
   }, [id]);
 
-  if (!dog) return <Typography>Hondenprofiel wordt geladen...</Typography>;
+  const handleDelete = async () => {
+    try {
+      await axiosInstance.delete(`/api/DogProfile/${id}`);
+      setDeleteDialogOpen(false);
+      navigate("/dogprofiles");
+    } catch (error) {
+      console.error("Fout bij verwijderen hondenprofiel:", error);
+    }
+  };
+
+  if (!dogProfile) {
+    return <Typography>Hondenprofiel wordt geladen...</Typography>;
+  }
 
   return (
-    <Container>
-      <Typography variant="h4">{dog.name}</Typography>
-      <Typography variant="body1">Ras: {dog.breed}</Typography>
-      <Typography variant="body1">
-        Geboortedatum: {new Date(dog.dateOfBirth).toLocaleDateString()}
+    <Container maxWidth="md">
+      <Typography variant="h4" gutterBottom>
+        {dogProfile.name}
       </Typography>
-      {/* notities */}
+      <Box
+        sx={{
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+          padding: "16px",
+          backgroundColor: "#f9f9f9",
+        }}
+      >
+        <Typography variant="body1">
+          <strong>Ras:</strong> {dogProfile.breed || "Niet gespecificeerd"}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Geboortedatum:</strong> {new Date(dogProfile.dateOfBirth).toLocaleDateString()}
+        </Typography>
+        {dogProfile.image && (
+          <img
+            src={dogProfile.image}
+            alt={dogProfile.name}
+            style={{ maxWidth: "100%", marginTop: "16px" }}
+          />
+        )}
+      </Box>
+      {isUserAdmin && (
+        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate(`/dogprofile-editor?id=${id}`)}
+          >
+            Bewerken
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            Verwijderen
+          </Button>
+        </Box>
+      )}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Hond Verwijderen</DialogTitle>
+        <DialogContent>
+          <Typography>Weet je zeker dat je dit hondenprofiel wilt verwijderen?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            Annuleren
+          </Button>
+          <Button onClick={handleDelete} color="error">
+            Verwijderen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 
-export default DogDetailsPage;
+export default DogProfileDetailsPage;

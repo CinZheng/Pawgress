@@ -1,43 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
 using Pawgress.Models;
 using Pawgress.Services;
+using System;
+using System.Linq;
 
 namespace Pawgress.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class NoteController : Controller
+    public class NoteController : BaseController<Note>
     {
         private readonly NoteService _service;
 
-        public NoteController(NoteService service)
+        public NoteController(NoteService service) : base(service)
         {
             _service = service;
         }
 
-        [HttpGet("user/{userId}")]
-        public IActionResult GetNotesByUser(Guid userId)
+        [HttpGet("dogprofile/{dogProfileId}")]
+        public IActionResult GetNotesByDogProfile(Guid dogProfileId)
         {
-            return Ok(_service.GetNotesByUser(userId));
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
-        {
-            var note = _service.GetById(id);
-            return note == null ? NotFound("Niet gevonden.") : Ok(note);
-        }
-
-        [HttpPost]
-        public IActionResult Create([FromBody] Note note)
-        {
-            return Ok(_service.Create(note));
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
-        {
-            return _service.Delete(id) ? Ok("Succesvol verwijderd.") : NotFound("Niet gevonden.");
+            var notes = _service.GetAll().Where(n => n.DogProfileId == dogProfileId)
+                .Select(n => new
+                {
+                    n.NoteId,
+                    n.Description,
+                    n.Tag,
+                    n.Date,
+                    UserName = n.User?.Username ?? "Onbekend"
+                }).ToList();
+            return Ok(notes);
         }
     }
 }

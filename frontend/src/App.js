@@ -16,6 +16,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import LibraryPage from "./pages/LibraryPage";
 import { isAuthenticated } from "./utils/auth";
 import { isAdmin } from "./utils/auth";
+import DogProfileEditorPage from "./pages/DogProfileEditorPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
@@ -117,6 +118,18 @@ function App() {
             <PrivateRoute>
               {isAdmin() ? (
                 <LessonEditorPage />
+              ) : (
+                <div>U heeft geen toegang tot deze pagina.</div>
+              )}
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dogprofile-editor"
+          element={
+            <PrivateRoute>
+              {isAdmin() ? (
+                <DogProfileEditorPage />
               ) : (
                 <div>U heeft geen toegang tot deze pagina.</div>
               )}

@@ -26,6 +26,7 @@ namespace Pawgress.Controllers
                 DogProfileId = dp.DogProfileId,
                 Name = dp.Name,
                 Breed = dp.Breed,
+                Image = dp.Image,
                 DateOfBirth = dp.DateOfBirth,
                 Notes = dp.Notes?.Select(n => n.Description).ToList()
             });
@@ -43,6 +44,7 @@ namespace Pawgress.Controllers
                 DogProfileId = dogProfile.DogProfileId,
                 Name = dogProfile.Name,
                 Breed = dogProfile.Breed,
+                Image = dogProfile.Image,
                 DateOfBirth = dogProfile.DateOfBirth,
                 Notes = dogProfile.Notes?.Select(n => n.Description).ToList()
             };
@@ -52,12 +54,14 @@ namespace Pawgress.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] DogProfileDto dogProfileDto)
         {
+             Console.WriteLine($"Image received: {dogProfileDto.Image}");
             var dogProfile = new DogProfile
             {
                 DogProfileId = Guid.NewGuid(),
                 Name = dogProfileDto.Name,
                 Breed = dogProfileDto.Breed,
-                DateOfBirth = dogProfileDto.DateOfBirth
+                DateOfBirth = dogProfileDto.DateOfBirth,
+                Image = dogProfileDto.Image
             };
 
             var created = _service.Create(dogProfile);
@@ -66,7 +70,8 @@ namespace Pawgress.Controllers
                 DogProfileId = created.DogProfileId,
                 Name = created.Name,
                 Breed = created.Breed,
-                DateOfBirth = created.DateOfBirth
+                DateOfBirth = created.DateOfBirth,
+                Image = created.Image
             });
         }
 
@@ -79,6 +84,7 @@ namespace Pawgress.Controllers
             dogProfile.Name = dogProfileDto.Name;
             dogProfile.Breed = dogProfileDto.Breed;
             dogProfile.DateOfBirth = dogProfileDto.DateOfBirth;
+            dogProfile.Image = dogProfileDto.Image;
 
             _service.Update(id, dogProfile);
             return Ok(dogProfileDto);
