@@ -109,6 +109,7 @@ function App() {
             <PrivateRoute>
               <QuizDetailsPage />
             </PrivateRoute>
+          }
         />
         <Route
           path="/quiz/:id"
