@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Grid, Card, CardContent, Typography, Button, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axios";
+import Layout from "../components/Layout";
 
 const LessonOverviewPage = () => {
   const [lessons, setLessons] = useState([]);
@@ -21,6 +22,7 @@ const LessonOverviewPage = () => {
   }, []);
 
   return (
+    <Layout>
     <Container>
       <Typography variant="h4" gutterBottom>
         Overzicht van Lessen
@@ -49,6 +51,7 @@ const LessonOverviewPage = () => {
         ))}
       </Grid>
     </Container>
+    </Layout>
   );
 };
 

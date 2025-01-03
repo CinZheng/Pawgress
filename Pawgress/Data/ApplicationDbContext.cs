@@ -20,6 +20,8 @@ namespace Pawgress.Data
 
         public DbSet<User_DogProfile> UserDogProfiles { get; set; }
         public DbSet<User_TrainingPath> UserTrainingPaths { get; set; }
+        public DbSet<DogSensorData> DogSensorDatas { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -78,6 +80,11 @@ namespace Pawgress.Data
                 .HasForeignKey(q => q.QuizId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // 1 - N relatie tussen DogProfile en DogSensorData
+            modelBuilder.Entity<DogSensorData>()
+                .HasOne(ds => ds.DogProfile)
+                .WithMany(dp => dp.DogSensorDatas)
+                .HasForeignKey(ds => ds.DogProfileId);
         }
     }
 }

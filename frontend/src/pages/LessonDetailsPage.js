@@ -4,6 +4,7 @@ import { Container, Typography, Button, Box, Dialog, DialogActions, DialogConten
 import { marked } from "marked";
 import axiosInstance from "../axios";
 import { isAdmin } from "../utils/auth";
+import Layout from "../components/Layout";
 
 const LessonDetailsPage = () => {
   const { id } = useParams(); // lesson id van route
@@ -42,6 +43,7 @@ const LessonDetailsPage = () => {
   }
 
   return (
+    <Layout>
     <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>
         {lesson.name}
@@ -95,6 +97,7 @@ const LessonDetailsPage = () => {
         </DialogActions>
       </Dialog>
     </Container>
+    </Layout>
   );
 };
 

@@ -14,24 +14,24 @@ namespace Pawgress.Services
             _dbSet = context.Set<T>();
         }
 
-        public List<T> GetAll()
+        public virtual List<T> GetAll()
         {
             return _dbSet.ToList();
         }
 
-        public T? GetById(Guid id)
+        public virtual T? GetById(Guid id)
         {
             return _dbSet.Find(id);
         }
 
-        public T Create(T entity)
+        public virtual T Create(T entity)
         {
             _dbSet.Add(entity);
             _context.SaveChanges();
             return entity;
         }
 
-        public T? Update(Guid id, T updatedEntity)
+        public virtual T? Update(Guid id, T updatedEntity)
         {
             var existingEntity = _dbSet.Find(id);
             if (existingEntity == null) return null;
@@ -53,7 +53,7 @@ namespace Pawgress.Services
             return existingEntity;
         }
 
-        public bool Delete(Guid id)
+        public virtual bool Delete(Guid id)
         {
             var entity = _dbSet.Find(id);
             if (entity == null) return false;

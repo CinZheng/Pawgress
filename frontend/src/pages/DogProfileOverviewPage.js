@@ -3,6 +3,7 @@ import axiosInstance from "../axios";
 import { Grid, Card, CardContent, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isAdmin } from "../utils/auth";
+import Layout from "../components/Layout";
 
 const DogProfileOverviewPage = () => {
   const [dogProfile, setDogs] = useState([]);
@@ -24,7 +25,13 @@ const DogProfileOverviewPage = () => {
   }, []);
 
   return (
+    <Layout>
     <Grid container spacing={2} padding={2}>
+      <Grid item xs={12}>
+              <Typography variant="h4" gutterBottom>
+                Honden
+              </Typography>
+            </Grid>
       {isUserAdmin && (
         <Grid item xs={12} style={{ marginBottom: "20px" }}>
           <Button
@@ -83,6 +90,7 @@ const DogProfileOverviewPage = () => {
         </Grid>
       ))}
     </Grid>
+    </Layout>
   );
 };
 

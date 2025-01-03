@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../axios";
 import { Typography, Container } from "@mui/material";
+import Layout from "../components/Layout";
 
 const ModuleDetailsPage = () => {
   const { id } = useParams();
@@ -23,11 +24,13 @@ const ModuleDetailsPage = () => {
   if (!module) return <Typography>Module wordt geladen...</Typography>;
 
   return (
+    <Layout>
     <Container>
       <Typography variant="h4">{module.name}</Typography>
       <Typography variant="body1">{module.description}</Typography>
       {/*extra details lessen of quizzes */}
     </Container>
+    </Layout>
   );
 };
 

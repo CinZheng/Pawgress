@@ -42,6 +42,17 @@ namespace Pawgress.Configurations
                         new string[] {}
                     }
                 });
+
+                // Log conflicting actions
+                c.ResolveConflictingActions(apiDescriptions =>
+                {
+                    foreach (var api in apiDescriptions)
+                    {
+                        Console.WriteLine($"Conflict: {api.HttpMethod} {api.RelativePath}");
+                    }
+                    return apiDescriptions.First();
+                });
+
             });
 
             return services;

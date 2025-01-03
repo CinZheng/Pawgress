@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../axios";
 import { Grid, Card, CardContent, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Layout from "../components/Layout";
 
 const ModulesPage = () => {
   const [modules, setModules] = useState([]);
@@ -21,6 +22,7 @@ const ModulesPage = () => {
   }, []);
 
   return (
+    <Layout>
     <Grid container spacing={2} padding={2}>
       <Grid item xs={12}>
         <Typography variant="h4" gutterBottom>
@@ -41,6 +43,7 @@ const ModulesPage = () => {
         </Grid>
       ))}
     </Grid>
+    </Layout>
   );
 };
 

@@ -17,17 +17,14 @@ namespace Pawgress.Controllers
             _context = context;
         }
 
-        [HttpPost("add-question")]
+        [HttpPost("{quizId}/add-question")]
         public IActionResult AddQuestionToQuiz(Guid quizId, [FromBody] QuizQuestion question)
         {
-            // check of quiz bestaat
             var quiz = _quizService.GetById(quizId);
             if (quiz == null) return NotFound("Quiz niet gevonden.");
 
-            // koppel de vraag aan de quiz
             question.QuizId = quizId;
 
-            // voeg vraag aan db
             _context.Questions.Add(question);
             _context.SaveChanges();
 

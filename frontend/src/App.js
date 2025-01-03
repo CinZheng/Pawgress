@@ -17,6 +17,10 @@ import LibraryPage from "./pages/LibraryPage";
 import { isAuthenticated } from "./utils/auth";
 import { isAdmin } from "./utils/auth";
 import DogProfileEditorPage from "./pages/DogProfileEditorPage";
+import SensorDataForm from "./pages/SensorDataForm";
+import SensorDataPage from "./pages/SensorDataPage";
+import QuizPage from "./pages/QuizPage";
+import QuizDetailsPage from "./pages/QuizDetailsPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
@@ -99,6 +103,22 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/quizzes/:id"
+          element={
+            <PrivateRoute>
+              <QuizDetailsPage />
+            </PrivateRoute>
+        />
+        <Route
+          path="/quiz/:id"
+          element={
+            <PrivateRoute>
+              <QuizPage />
+            </PrivateRoute>
+          }
+        />
+
         {/* Beveiligde routes alleen voor admins */}
         <Route
           path="/quiz-editor"
@@ -136,6 +156,16 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route 
+          path="/sensor-data-form" 
+          element={
+            <SensorDataForm />
+          } />
+          <Route 
+          path="/sensor-data" 
+          element={
+            <SensorDataPage />
+          } />
       </Routes>
     </Router>
   );

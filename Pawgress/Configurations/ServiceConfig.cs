@@ -23,6 +23,7 @@ namespace Pawgress.Extensions
             services.AddScoped<QuizService>();
             services.AddScoped<LessonService>();
             services.AddScoped<DogProfileService>(); 
+            services.AddScoped<DogSensorData>(); 
             return services;
         }
     }

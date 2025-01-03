@@ -1,3 +1,5 @@
+using Pawgress.Models;
+
 public class DogProfileDto
 {
     public Guid DogProfileId { get; set; }
@@ -6,4 +8,5 @@ public class DogProfileDto
     public string Image { get; set; }
     public DateTime DateOfBirth { get; set; }
     public List<string>? Notes { get; set; }
+    public List<DogSensorData>? DogSensorDatas { get; set; }
 }

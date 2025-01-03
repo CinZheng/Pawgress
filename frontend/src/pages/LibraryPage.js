@@ -3,6 +3,7 @@ import axiosInstance from "../axios";
 import { Grid, Card, CardContent, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isAdmin } from "../utils/auth";
+import Layout from "../components/Layout";
 
 const LibraryPage = () => {
   const [lessons, setLessons] = useState([]);
@@ -28,6 +29,7 @@ const LibraryPage = () => {
   }, []);
 
   return (
+    <Layout>
     <Grid container spacing={2} padding={2}>
       {/* Beheer knoppen voor admin */}
       {isUserAdmin && (
@@ -81,7 +83,7 @@ const LibraryPage = () => {
       {quizzes.map((quiz) => (
         <Grid item xs={12} sm={6} md={4} key={quiz.quizId}>
           <Card
-            onClick={() => navigate(`/quiz-editor/${quiz.quizId}`)}
+            onClick={() => navigate(`/quizzes/${quiz.quizId}`)}
             style={{ cursor: "pointer" }}
           >
             <CardContent>
@@ -94,6 +96,7 @@ const LibraryPage = () => {
         </Grid>
       ))}
     </Grid>
+    </Layout>
   );
 };
 

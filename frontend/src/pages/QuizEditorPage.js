@@ -1,106 +1,172 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { TextField, Button, List, ListItem, Typography, Box } from "@mui/material";
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axiosInstance from "../axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const QuizEditor = ({ quizId }) => {
-  const [questions, setQuestions] = useState([]);
-  const [newQuestion, setNewQuestion] = useState({
-    questionText: "",
-    correctAnswer: "",
-    mediaUrl: "",
+const QuizEditorPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const quizId = queryParams.get("id");
+
+  const [quiz, setQuiz] = useState({
+    quizName: "",
+    quizDescription: "",
   });
-  const [error, setError] = useState("");
+  const [questions, setQuestions] = useState([]);
 
-  // basis URL voor de API
-  const baseURL = "http://localhost:5232";
-
-  // haal bestaande vragen op
+  // Ophalen van quizgegevens als er een quizId is
   useEffect(() => {
-    axios
-      .get(`${baseURL}/api/Quiz/${quizId}/questions`)
-      .then((response) => {
-        setQuestions(response.data);
-      })
-      .catch((error) => {
-        console.error("Fout bij het ophalen van vragen:", error);
-      });
+    const fetchQuiz = async () => {
+      if (!quizId) return;
+
+      try {
+        const response = await axiosInstance.get(`/api/Quiz/${quizId}`);
+        setQuiz({
+          quizName: response.data.quizName,
+          quizDescription: response.data.quizDescription,
+        });
+
+        // Ophalen van de vragen van de quiz
+        const questionsResponse = await axiosInstance.get(`/api/Quiz/${quizId}/questions`);
+        setQuestions(
+          questionsResponse.data.map((q) => ({
+            text: q.questionText,
+            correctAnswer: q.correctAnswer,
+            mediaUrl: q.mediaUrl || "",
+          }))
+        );
+      } catch (error) {
+        console.error("Fout bij ophalen quiz:", error);
+      }
+    };
+
+    fetchQuiz();
   }, [quizId]);
 
-  // voeg een nieuwe vraag toe
-  const handleAddQuestion = () => {
-    // validatie
-    if (!newQuestion.questionText || !newQuestion.correctAnswer) {
-      setError("Vraagtekst en Correct Antwoord zijn verplicht.");
-      return;
-    }
+  const handleQuizChange = (e) => {
+    setQuiz({ ...quiz, [e.target.name]: e.target.value });
+  };
 
-    setError("");
-    axios
-      .post(`${baseURL}/api/Quiz/add-question`, {
-        ...newQuestion,
-        quizId: quizId,
-      })
-      .then((response) => {
-        setQuestions([...questions, newQuestion]);
-        setNewQuestion({
-          questionText: "",
-          correctAnswer: "",
-          mediaUrl: "",
-        });
-      })
-      .catch((error) => {
-        console.error("Fout bij het toevoegen van de vraag:", error);
-      });
+  const handleQuestionChange = (index, field, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index][field] = value;
+    setQuestions(updatedQuestions);
+  };
+
+  const addQuestion = () => {
+    setQuestions([...questions, { text: "", correctAnswer: "", mediaUrl: "" }]);
+  };
+
+  const removeQuestion = (index) => {
+    const updatedQuestions = questions.filter((_, i) => i !== index);
+    setQuestions(updatedQuestions);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (quizId) {
+        // Bijwerken van bestaande quiz
+        await axiosInstance.put(`/api/Quiz/${quizId}`, quiz);
+
+        // verwijder vragen
+        await axiosInstance.delete(`/api/Quiz/${quizId}/questions`);
+        for (const question of questions) {
+          await axiosInstance.post(`/api/Quiz/${quizId}/add-question`, question);
+        }
+      } else {
+        // Nieuwe quiz aanmaken
+        const response = await axiosInstance.post("/api/Quiz", quiz);
+        const newQuizId = response.data.quizId;
+
+        for (const question of questions) {
+          await axiosInstance.post(`/api/Quiz/${newQuizId}/add-question`, question);
+        }
+      }
+
+      alert("Quiz succesvol opgeslagen!");
+      navigate("/library");
+    } catch (error) {
+      console.error("Fout bij opslaan quiz:", error);
+    }
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Container>
       <Typography variant="h4" gutterBottom>
-        Quiz Editor
+        {quizId ? "Quiz Bewerken" : "Nieuwe Quiz Aanmaken"}
       </Typography>
-
-      {/* Formulier voor nieuwe vraag */}
-      <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 4 }}>
+      <Box>
         <TextField
-          label="Vraagtekst"
-          value={newQuestion.questionText}
-          onChange={(e) => setNewQuestion({ ...newQuestion, questionText: e.target.value })}
-          required
+          name="quizName"
+          label="Quiznaam"
+          fullWidth
+          margin="normal"
+          value={quiz.quizName}
+          onChange={handleQuizChange}
         />
         <TextField
-          label="Correct Antwoord"
-          value={newQuestion.correctAnswer}
-          onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswer: e.target.value })}
-          required
+          name="quizDescription"
+          label="Quizbeschrijving"
+          fullWidth
+          margin="normal"
+          multiline
+          rows={2}
+          value={quiz.quizDescription}
+          onChange={handleQuizChange}
         />
-        <TextField
-          label="Media URL"
-          value={newQuestion.mediaUrl}
-          onChange={(e) => setNewQuestion({ ...newQuestion, mediaUrl: e.target.value })}
-        />
-        {error && (
-          <Typography color="error" variant="body2">
-            {error}
-          </Typography>
-        )}
-        <Button variant="contained" onClick={handleAddQuestion}>
-          Voeg Vraag Toe
-        </Button>
       </Box>
-
-      {/* Lijst van bestaande vragen */}
       <Typography variant="h5" gutterBottom>
-        Bestaande Vragen
+        Vragen
       </Typography>
-      <List>
-        {questions.map((q, index) => (
-          <ListItem key={index}>
-            {index + 1}. {q.questionText}
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+      {questions.map((question, index) => (
+        <Card key={index} sx={{ marginBottom: 2 }}>
+          <CardContent>
+            <TextField
+              label="Vraagtekst"
+              fullWidth
+              margin="normal"
+              value={question.text}
+              onChange={(e) => handleQuestionChange(index, "text", e.target.value)}
+            />
+            <TextField
+              label="Correct Antwoord"
+              fullWidth
+              margin="normal"
+              value={question.correctAnswer}
+              onChange={(e) => handleQuestionChange(index, "correctAnswer", e.target.value)}
+            />
+            <TextField
+              label="Media URL (optioneel)"
+              fullWidth
+              margin="normal"
+              value={question.mediaUrl}
+              onChange={(e) => handleQuestionChange(index, "mediaUrl", e.target.value)}
+            />
+            <IconButton onClick={() => removeQuestion(index)} color="error">
+              <DeleteIcon />
+            </IconButton>
+          </CardContent>
+        </Card>
+      ))}
+      <Button variant="contained" onClick={addQuestion}>
+        Vraag Toevoegen
+      </Button>
+      <Button variant="contained" color="primary" onClick={handleSubmit}>
+        Opslaan
+      </Button>
+    </Container>
   );
 };
 
-export default QuizEditor;
+export default QuizEditorPage;

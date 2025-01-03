@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawgress.Data;
 
@@ -11,9 +12,11 @@ using Pawgress.Data;
 namespace Pawgress.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103170539_AddDogSensorDataRelation")]
+    partial class AddDogSensorDataRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,14 +55,14 @@ namespace Pawgress.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("AverageValue")
+                    b.Property<double?>("AverageValue")
                         .HasColumnType("float");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DogProfileId")
+                    b.Property<Guid?>("DogProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
@@ -69,8 +72,9 @@ namespace Pawgress.Migrations
                     b.Property<DateTime>("RecordedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SensorType")
-                        .HasColumnType("int");
+                    b.Property<string>("SensorType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Unit")
                         .IsRequired()
@@ -364,9 +368,7 @@ namespace Pawgress.Migrations
                 {
                     b.HasOne("Pawgress.Models.DogProfile", "DogProfile")
                         .WithMany("DogSensorDatas")
-                        .HasForeignKey("DogProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DogProfileId");
 
                     b.Navigation("DogProfile");
                 });

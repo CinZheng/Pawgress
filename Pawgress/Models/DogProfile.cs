@@ -10,7 +10,12 @@ namespace Pawgress.Models
         public string? Breed { get; set; }
         public string? Image { get; set; }
         public DateTime DateOfBirth { get; set; }
+
+        // relatie met Notes 
         public List<Note>? Notes { get; set; } = new List<Note>();
+        // relatie met Users
         public List<User_DogProfile>? UserDogProfiles { get; set; } = new List<User_DogProfile>();
+        // relatie met DogSensorData
+          public List<DogSensorData>? DogSensorDatas { get; set; } = new List<DogSensorData>();
     }
 }

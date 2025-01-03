@@ -3,6 +3,7 @@ import axiosInstance from "../axios";
 import { Typography, Button, Avatar, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isAdmin } from "../utils/auth";
+import Layout from "../components/Layout";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -41,6 +42,7 @@ const ProfilePage = () => {
   if (!user) return <Typography>Profiel wordt geladen...</Typography>;
 
   return (
+    <Layout>
     <Container style={{ textAlign: "center", padding: "20px" }}>
       <Avatar
         alt={user.username}
@@ -62,6 +64,7 @@ const ProfilePage = () => {
         Uitloggen
       </Button>
     </Container>
+    </Layout>
   );
 };
 
