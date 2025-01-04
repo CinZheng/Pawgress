@@ -10,6 +10,7 @@ namespace Pawgress.Dtos
         public string? QuizDescription { get; set; }
         public Guid? TrainingPathId { get; set; }
         public List<QuizQuestionDto>? QuizQuestions { get; set; } = new List<QuizQuestionDto>();
+         public int SortOrder { get; set; } // voor trainingpath
     }
 
     public class QuizQuestionDto

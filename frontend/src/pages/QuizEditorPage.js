@@ -153,6 +153,18 @@ const QuizEditorPage = () => {
 
   return (
     <Container maxWidth="md">
+      {/* Alerts bovenaan */}
+      {message && (
+        <Alert severity="success" sx={{ marginBottom: 2 }}>
+          {message}
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ marginBottom: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <Typography variant="h4" gutterBottom>
         {quizId ? "Quiz Bewerken" : "Nieuwe Quiz Aanmaken"}
       </Typography>
@@ -218,8 +230,6 @@ const QuizEditorPage = () => {
         <Button type="submit" variant="contained" color="primary">
           {quizId ? "Bijwerken" : "Toevoegen"}
         </Button>
-        {message && <Alert severity="success">{message}</Alert>}
-        {error && <Alert severity="error">{error}</Alert>}
       </Box>
     </Container>
   );

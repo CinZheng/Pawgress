@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Container, TextField, Button, Typography, Box, Alert } from "@mui/material";
 import axiosInstance from "../axios";
 
 const DogProfileEditorPage = () => {
@@ -12,6 +20,7 @@ const DogProfileEditorPage = () => {
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dogId = searchParams.get("id");
@@ -19,18 +28,22 @@ const DogProfileEditorPage = () => {
   // Fetch details if editing an existing dog
   useEffect(() => {
     const fetchDog = async () => {
-      if (dogId) {
-        try {
-          const response = await axiosInstance.get(`/api/DogProfile/${dogId}`);
-          setFormData({
-            name: response.data.name || "",
-            breed: response.data.breed || "",
-            dateOfBirth: response.data.dateOfBirth || "",
-            image: response.data.image || "",
-          });
-        } catch (error) {
-          console.error("Error fetching dog profile:", error);
-        }
+      if (!dogId) return;
+
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get(`/api/DogProfile/${dogId}`);
+        setFormData({
+          name: response.data.name || "",
+          breed: response.data.breed || "",
+          dateOfBirth: response.data.dateOfBirth || "",
+          image: response.data.image || "",
+        });
+      } catch (err) {
+        console.error("Fout bij ophalen hondenprofiel:", err);
+        setError("Kon hondenprofiel niet ophalen.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -42,16 +55,22 @@ const DogProfileEditorPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateDogProfile = () => {
+    if (!formData.name.trim()) {
+      setError("De naam is verplicht.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
 
-    if (!formData.name.trim()) {
-      setError("De naam is verplicht.");
-      return;
-    }
+    if (!validateDogProfile()) return;
 
+    setLoading(true);
     try {
       if (dogId) {
         // Update existing dog profile
@@ -64,17 +83,46 @@ const DogProfileEditorPage = () => {
       }
       navigate("/dogprofiles");
     } catch (err) {
-      setError("Er is iets fout gegaan bij het opslaan van het hondenprofiel.");
-      console.error(err);
+      console.error("Fout bij opslaan hondenprofiel:", err);
+      setError("Er is een fout opgetreden bij het opslaan van het hondenprofiel.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <Container maxWidth="md" sx={{ textAlign: "center", marginTop: "50px" }}>
+        <CircularProgress />
+        <Typography variant="h6" sx={{ marginTop: 2 }}>
+          Hondenprofiel wordt geladen...
+        </Typography>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="md">
+      {/* Alerts bovenaan */}
+      {message && (
+        <Alert severity="success" sx={{ marginBottom: 2 }}>
+          {message}
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ marginBottom: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <Typography variant="h4" gutterBottom>
         {dogId ? "Hondenprofiel Bewerken" : "Nieuw Hondenprofiel Toevoegen"}
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+      >
         <TextField
           label="Naam"
           name="name"
@@ -109,8 +157,6 @@ const DogProfileEditorPage = () => {
         <Button type="submit" variant="contained" color="primary">
           {dogId ? "Bijwerken" : "Toevoegen"}
         </Button>
-        {message && <Alert severity="success">{message}</Alert>}
-        {error && <Alert severity="error">{error}</Alert>}
       </Box>
     </Container>
   );

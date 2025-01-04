@@ -14,6 +14,6 @@ namespace Pawgress.Models
         public string? MarkdownContent { get; set; }
         public Guid? TrainingPathId { get; set; }
         public TrainingPath? TrainingPath { get; set; }
-
+         public int SortOrder { get; set; } // voor trainingpath
     }
 }

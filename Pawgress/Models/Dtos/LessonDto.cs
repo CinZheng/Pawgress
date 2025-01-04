@@ -13,5 +13,6 @@ namespace Pawgress.Dtos
         public string? Tag { get; set; }
         public string? MarkdownContent { get; set; }
         public Guid? TrainingPathId { get; set; }
+        public int SortOrder { get; set; } // voor trainingpath
     }
 }

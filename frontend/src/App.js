@@ -21,6 +21,8 @@ import SensorDataForm from "./pages/SensorDataForm";
 import SensorDataPage from "./pages/SensorDataPage";
 import QuizPage from "./pages/QuizPage";
 import QuizDetailsPage from "./pages/QuizDetailsPage";
+import ModuleEditorPage from "./pages/ModuleEditorPage";
+import ModuleResultPage from "./pages/ModuleResultPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
@@ -68,6 +70,14 @@ function App() {
           element={
             <PrivateRoute>
               <ModuleDetailsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/modules/:id/result"
+          element={
+            <PrivateRoute>
+              <ModuleResultPage />
             </PrivateRoute>
           }
         />
@@ -139,6 +149,18 @@ function App() {
             <PrivateRoute>
               {isAdmin() ? (
                 <LessonEditorPage />
+              ) : (
+                <div>U heeft geen toegang tot deze pagina.</div>
+              )}
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/module-editor"
+          element={
+            <PrivateRoute>
+              {isAdmin() ? (
+                <ModuleEditorPage />
               ) : (
                 <div>U heeft geen toegang tot deze pagina.</div>
               )}
