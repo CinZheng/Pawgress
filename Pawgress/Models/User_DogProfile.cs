@@ -8,7 +8,7 @@ namespace Pawgress.Models
         public Guid DogProfileId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-
+        public bool IsFavorite { get; set; }
         public User User { get; set; }
         public DogProfile DogProfile { get; set; }
     }

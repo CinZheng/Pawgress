@@ -85,6 +85,11 @@ namespace Pawgress.Data
                 .HasOne(ds => ds.DogProfile)
                 .WithMany(dp => dp.DogSensorDatas)
                 .HasForeignKey(ds => ds.DogProfileId);
+
+            // fave doggo
+            modelBuilder.Entity<User_DogProfile>()
+                .Property(ud => ud.IsFavorite)
+                .HasDefaultValue(false);
         }
     }
 }

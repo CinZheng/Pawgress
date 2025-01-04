@@ -14,7 +14,6 @@ namespace Pawgress.Extensions
             services.AddScoped<BaseService<Quiz>>();
             services.AddScoped<BaseService<Note>>();
 
-
             // specific services
             services.AddScoped<UserService>();
             services.AddScoped<TrainingPathService>();
