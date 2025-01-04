@@ -202,10 +202,10 @@ const DogProfileDetailsPage = () => {
         ))}
       </Grid>
 
-      {/* Popup for Adding/Editing Note */}
+      {/* Popup for Adding/Editing Note - editing wip */}
       <Dialog open={addNoteDialogOpen} onClose={() => setAddNoteDialogOpen(false)}>
         <DialogTitle>
-          {selectedNote?.noteId ? "Notitie Bewerken" : "Nieuwe Notitie Toevoegen"}
+          {selectedNote?.noteId ? "Notitie Bewerken" : "Nieuwe Notitie Toevoegen"} 
         </DialogTitle>
         <DialogContent>
           <TextField

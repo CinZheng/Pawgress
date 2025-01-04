@@ -31,7 +31,7 @@ const QuizDetailsPage = () => {
     try {
       await axiosInstance.delete(`/api/Quiz/${id}`);
       setDeleteDialogOpen(false);
-      navigate("/quizzes");
+      navigate("/library");
     } catch (error) {
       console.error("Error deleting quiz:", error);
     }

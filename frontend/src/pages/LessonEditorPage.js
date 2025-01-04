@@ -71,7 +71,7 @@ const LessonEditorPage = () => {
         await axiosInstance.post("/api/Lesson", formData);
         setMessage("De les is succesvol toegevoegd!");
       }
-      navigate("/lessons");
+      navigate("/library");
     } catch (err) {
       setError("Er is iets fout gegaan bij het opslaan van de les.");
       console.error(err);

@@ -20,7 +20,7 @@ namespace Pawgress.Controllers
             _context = context;
         }
 
-        [HttpGet]
+          [HttpGet]
         public IActionResult GetAll()
         {
             var quizzes = _quizService.GetAll();
@@ -41,7 +41,7 @@ namespace Pawgress.Controllers
             return Ok(dtos);
         }
 
-        [HttpGet("{id}")]
+          [HttpGet("{id}")]
         public IActionResult GetQuizById(Guid id)
         {
             var quiz = _quizService.GetById(id);
@@ -65,7 +65,7 @@ namespace Pawgress.Controllers
             return Ok(quizDto);
         }
 
-        [HttpPost]
+         [HttpPost]
         public IActionResult CreateQuiz([FromBody] QuizDto quizDto)
         {
             var quiz = new Quiz
@@ -87,7 +87,7 @@ namespace Pawgress.Controllers
             return Ok(new { createdQuiz.QuizId });
         }
 
-        [HttpPut("{id}")]
+         [HttpPut("{id}")]
         public IActionResult UpdateQuiz(Guid id, [FromBody] QuizDto quizDto)
         {
             var existingQuiz = _quizService.GetById(id);
@@ -98,7 +98,7 @@ namespace Pawgress.Controllers
             existingQuiz.TrainingPathId = quizDto.TrainingPathId;
 
             // Update de vragen
-            existingQuiz.QuizQuestions = quizDto.QuizQuestions?.Select(q => new QuizQuestion
+            var updatedQuestions = quizDto.QuizQuestions.Select(q => new QuizQuestion
             {
                 QuizQuestionId = q.QuizQuestionId ?? Guid.NewGuid(),
                 QuestionText = q.QuestionText,
@@ -107,7 +107,12 @@ namespace Pawgress.Controllers
                 QuizId = id
             }).ToList();
 
+            _context.Questions.RemoveRange(existingQuiz.QuizQuestions);
+            _context.Questions.AddRange(updatedQuestions);
+
             _quizService.Update(id, existingQuiz);
+            _context.SaveChanges();
+
             return Ok("Quiz succesvol bijgewerkt.");
         }
 

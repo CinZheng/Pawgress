@@ -32,7 +32,7 @@ const LessonDetailsPage = () => {
     try {
       await axiosInstance.delete(`/api/Lesson/${id}`);
       setDeleteDialogOpen(false);
-      navigate("/lessons");
+      navigate("/library");
     } catch (error) {
       console.error("Error deleting lesson:", error);
     }

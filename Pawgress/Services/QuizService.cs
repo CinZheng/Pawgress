@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Pawgress.Data;
 using Pawgress.Models;
 
@@ -17,6 +18,22 @@ namespace Pawgress.Services
             quiz.QuizQuestions.Add(question);
             Update(quizId, quiz);
             return quiz;
+        }
+
+        public override Quiz? GetById(Guid id)
+        {
+            // Laadt ook de gerelateerde QuizQuestions
+            return _context.Quizzes
+                .Include(q => q.QuizQuestions)
+                .FirstOrDefault(q => q.QuizId == id);
+        }
+
+        public override List<Quiz> GetAll()
+        {
+            // Laadt ook de gerelateerde QuizQuestions
+            return _context.Quizzes
+                .Include(q => q.QuizQuestions)
+                .ToList();
         }
     }
 }
