@@ -25,6 +25,8 @@ namespace Pawgress.Services
         public User CreateUser(User newUser)
         {
             newUser.UserId = Guid.NewGuid();
+            newUser.CreationDate = DateTime.Now;
+            newUser.UpdateDate = DateTime.Now;
             _context.Users.Add(newUser);
             _context.SaveChanges();
             return newUser;
@@ -38,6 +40,7 @@ namespace Pawgress.Services
             user.Username = updatedUser.Username ?? user.Username;
             user.Email = updatedUser.Email ?? user.Email;
             user.ProgressData = updatedUser.ProgressData ?? user.ProgressData;
+            user.UpdateDate = DateTime.Now;
 
             _context.SaveChanges();
             return user;

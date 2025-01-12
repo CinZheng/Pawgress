@@ -28,7 +28,9 @@ namespace Pawgress.Controllers
                 Breed = dp.Breed,
                 Image = dp.Image,
                 DateOfBirth = dp.DateOfBirth,
-                Notes = dp.Notes?.Select(n => n.Description).ToList()
+                Notes = dp.Notes?.Select(n => n.Description).ToList(),
+                CreationDate = dp.CreationDate,
+                UpdateDate = dp.UpdateDate
             });
             return Ok(dtos);
         }
@@ -46,7 +48,11 @@ namespace Pawgress.Controllers
                 Breed = dogProfile.Breed,
                 Image = dogProfile.Image,
                 DateOfBirth = dogProfile.DateOfBirth,
-                Notes = dogProfile.Notes?.Select(n => n.Description).ToList()
+                Notes = dogProfile.Notes?.Select(n => n.Description).ToList(),
+                CreationDate = dogProfile.CreationDate,
+                UpdateDate = dogProfile.UpdateDate
+
+
             };
             return Ok(dto);
         }
@@ -61,7 +67,10 @@ namespace Pawgress.Controllers
                 Name = dogProfileDto.Name,
                 Breed = dogProfileDto.Breed,
                 DateOfBirth = dogProfileDto.DateOfBirth,
-                Image = dogProfileDto.Image
+                Image = dogProfileDto.Image,
+                CreationDate = DateTime.Now,
+                UpdateDate = DateTime.Now
+
             };
 
             var created = _service.Create(dogProfile);
@@ -71,7 +80,9 @@ namespace Pawgress.Controllers
                 Name = created.Name,
                 Breed = created.Breed,
                 DateOfBirth = created.DateOfBirth,
-                Image = created.Image
+                Image = created.Image,
+                CreationDate = created.CreationDate,
+                UpdateDate = created.UpdateDate
             });
         }
 
@@ -85,7 +96,7 @@ namespace Pawgress.Controllers
             dogProfile.Breed = dogProfileDto.Breed;
             dogProfile.DateOfBirth = dogProfileDto.DateOfBirth;
             dogProfile.Image = dogProfileDto.Image;
-
+            dogProfile.UpdateDate = DateTime.Now;
             _service.Update(id, dogProfile);
             return Ok(dogProfileDto);
         }

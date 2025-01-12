@@ -5,7 +5,7 @@ using Pawgress.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 
+// voor bug
 var isMigration = args.Contains("--migration");
 
 if (!isMigration)
@@ -68,7 +68,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// seeding db
+// // seeding db
 // using (var scope = app.Services.CreateScope())
 // {
 //     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

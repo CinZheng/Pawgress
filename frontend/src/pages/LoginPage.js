@@ -3,7 +3,7 @@ import axiosInstance from "../axios";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const LoginPage = ({ onLogin }) => { // onLogin toegevoegd als prop
+const LoginPage = ({ onLogin }) => { // onLogin added as a prop
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -15,18 +15,22 @@ const LoginPage = ({ onLogin }) => { // onLogin toegevoegd als prop
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Send login request
       const response = await axiosInstance.post("/api/Auth/login", formData);
-      const { token, userId } = response.data;
+      const { token, userId } = response.data; // Extract token and userId from response
+
+      // Store token and userId in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
-      //console.log("login: " + localStorage.getItem("token"));
 
       setMessage("Inloggen succesvol!");
 
-      // Update inlogstatus in App.js
-      onLogin(); // Callback om de inlogstatus bij te werken
+      // Notify parent component of login status
+      if (onLogin) {
+        onLogin();
+      }
 
-      // Redirect naar profielpagina
+      // Redirect to profile page or another page as desired
       navigate("/profile");
     } catch (error) {
       console.error("Inlogfout:", error);
@@ -39,7 +43,11 @@ const LoginPage = ({ onLogin }) => { // onLogin toegevoegd als prop
       <Typography variant="h4" gutterBottom>
         Inloggen
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
         <TextField
           name="email"
           label="E-mailadres"
@@ -61,7 +69,7 @@ const LoginPage = ({ onLogin }) => { // onLogin toegevoegd als prop
         </Button>
       </Box>
       {message && <Typography sx={{ marginTop: 2 }}>{message}</Typography>}
-      {/* Navigatie naar register */}
+      {/* Link to Register */}
       <Typography sx={{ marginTop: 2, textAlign: "center" }}>
         Nog geen account?{" "}
         <Button

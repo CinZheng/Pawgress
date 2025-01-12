@@ -10,8 +10,11 @@ namespace Pawgress.Models
         public string? Status { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? CompletionDate { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
 
-        public User User { get; set; }
-        public TrainingPath TrainingPath { get; set; }
+        // Navigation properties
+        public virtual User User { get; set; }
+        public virtual TrainingPath TrainingPath { get; set; }
     }
 }

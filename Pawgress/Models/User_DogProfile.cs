@@ -11,5 +11,7 @@ namespace Pawgress.Models
         public bool IsFavorite { get; set; }
         public User User { get; set; }
         public DogProfile DogProfile { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

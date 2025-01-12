@@ -2,9 +2,8 @@ using System;
 
 namespace Pawgress.Dtos
 {
-    public class LessonDto
+    public class LessonDto : TrainingPathItemDto
     {
-        public Guid LessonId { get; set; }
         public string Name { get; set; }
         public string? Text { get; set; }
         public string? Video { get; set; }
@@ -13,6 +12,9 @@ namespace Pawgress.Dtos
         public string? Tag { get; set; }
         public string? MarkdownContent { get; set; }
         public Guid? TrainingPathId { get; set; }
-        public int SortOrder { get; set; } // voor trainingpath
+        public int SortOrder { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+
     }
 }

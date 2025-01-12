@@ -3,6 +3,7 @@ using Pawgress.Data;
 using Pawgress.Dtos;
 using Pawgress.Models;
 using Pawgress.Services;
+using System;
 using System.Linq;
 
 namespace Pawgress.Controllers
@@ -20,15 +21,17 @@ namespace Pawgress.Controllers
             _context = context;
         }
 
-          [HttpGet]
+        [HttpGet]
         public IActionResult GetAll()
         {
             var quizzes = _quizService.GetAll();
             var dtos = quizzes.Select(q => new QuizDto
             {
-                QuizId = q.QuizId,
-                QuizName = q.QuizName,
-                QuizDescription = q.QuizDescription,
+                Id = q.Id, // Polymorphic Id
+                QuizName = q.Name,
+                QuizDescription = q.Description,
+                CreationDate = q.CreationDate,
+                UpdateDate = q.UpdateDate,
                 QuizQuestions = q.QuizQuestions.Select(qq => new QuizQuestionDto
                 {
                     QuizQuestionId = qq.QuizQuestionId,
@@ -41,7 +44,7 @@ namespace Pawgress.Controllers
             return Ok(dtos);
         }
 
-          [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public IActionResult GetQuizById(Guid id)
         {
             var quiz = _quizService.GetById(id);
@@ -49,10 +52,12 @@ namespace Pawgress.Controllers
 
             var quizDto = new QuizDto
             {
-                QuizId = quiz.QuizId,
-                QuizName = quiz.QuizName,
-                QuizDescription = quiz.QuizDescription,
+                Id = quiz.Id, // Polymorphic Id
+                QuizName = quiz.Name,
+                QuizDescription = quiz.Description,
                 TrainingPathId = quiz.TrainingPathId,
+                CreationDate = quiz.CreationDate,
+                UpdateDate = quiz.UpdateDate,
                 QuizQuestions = quiz.QuizQuestions?.Select(q => new QuizQuestionDto
                 {
                     QuizQuestionId = q.QuizQuestionId,
@@ -65,15 +70,17 @@ namespace Pawgress.Controllers
             return Ok(quizDto);
         }
 
-         [HttpPost]
+        [HttpPost]
         public IActionResult CreateQuiz([FromBody] QuizDto quizDto)
         {
             var quiz = new Quiz
             {
-                QuizId = Guid.NewGuid(),
-                QuizName = quizDto.QuizName,
-                QuizDescription = quizDto.QuizDescription,
+                Id = Guid.NewGuid(), // Polymorphic Id
+                Name = quizDto.QuizName,
+                Description = quizDto.QuizDescription,
                 TrainingPathId = quizDto.TrainingPathId,
+                CreationDate = DateTime.Now,
+                UpdateDate = DateTime.Now,
                 QuizQuestions = quizDto.QuizQuestions?.Select(q => new QuizQuestion
                 {
                     QuizQuestionId = Guid.NewGuid(),
@@ -84,20 +91,21 @@ namespace Pawgress.Controllers
             };
 
             var createdQuiz = _quizService.Create(quiz);
-            return Ok(new { createdQuiz.QuizId });
+            return Ok(new { createdQuiz.Id });
         }
 
-         [HttpPut("{id}")]
+        [HttpPut("{id}")]
         public IActionResult UpdateQuiz(Guid id, [FromBody] QuizDto quizDto)
         {
             var existingQuiz = _quizService.GetById(id);
             if (existingQuiz == null) return NotFound("Quiz niet gevonden.");
 
-            existingQuiz.QuizName = quizDto.QuizName;
-            existingQuiz.QuizDescription = quizDto.QuizDescription;
+            existingQuiz.Name = quizDto.QuizName;
+            existingQuiz.Description = quizDto.QuizDescription;
             existingQuiz.TrainingPathId = quizDto.TrainingPathId;
+            existingQuiz.UpdateDate = DateTime.Now;
 
-            // Update de vragen
+            // Update questions
             var updatedQuestions = quizDto.QuizQuestions.Select(q => new QuizQuestion
             {
                 QuizQuestionId = q.QuizQuestionId ?? Guid.NewGuid(),
@@ -128,7 +136,9 @@ namespace Pawgress.Controllers
                 QuestionText = questionDto.QuestionText,
                 CorrectAnswer = questionDto.CorrectAnswer,
                 MediaUrl = questionDto.MediaUrl,
-                QuizId = quizId
+                QuizId = quizId,
+                CreationDate = DateTime.Now,
+                UpdateDate = DateTime.Now
             };
 
             _context.Questions.Add(question);
@@ -150,7 +160,9 @@ namespace Pawgress.Controllers
                     QuizQuestionId = q.QuizQuestionId,
                     QuestionText = q.QuestionText,
                     CorrectAnswer = q.CorrectAnswer,
-                    MediaUrl = q.MediaUrl
+                    MediaUrl = q.MediaUrl,
+                    CreationDate = q.CreationDate,
+                    UpdateDate = q.UpdateDate
                 }).ToList();
 
             return Ok(questions);
@@ -170,7 +182,6 @@ namespace Pawgress.Controllers
             _context.SaveChanges();
 
             return Ok("Quiz succesvol verwijderd.");
-
         }
     }
 }

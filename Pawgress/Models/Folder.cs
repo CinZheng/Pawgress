@@ -13,6 +13,8 @@ namespace Pawgress.Models
         public List<Lesson> Lessons { get; set; } = new List<Lesson>();
         public List<Quiz> Quizzes { get; set; } = new List<Quiz>();
         public Folder? ParentFolder { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }
 

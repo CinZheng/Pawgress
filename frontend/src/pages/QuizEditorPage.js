@@ -130,7 +130,7 @@ const QuizEditorPage = () => {
           quizQuestions: questions,
         });
         setMessage("Quiz succesvol aangemaakt!");
-        navigate(`/quizzes/${response.data.quizId}`);
+        navigate(`/quizzes/${response.data.id}`);
       }
     } catch (err) {
       console.error("Fout bij opslaan quiz:", err);

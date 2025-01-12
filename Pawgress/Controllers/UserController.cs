@@ -18,7 +18,7 @@ namespace Pawgress.Controllers
 
         // GET: api/User
         [HttpGet]
-        //[Authorize(Roles = "Admin")] // alleen beheerders kunnen alle gebruikers zien, voor testing nu gecomment hihi
+        //[Authorize(Roles = "Admin")] // alleen beheerders kunnen alle gebruikers zien, voor testing nu gecomment
         public IActionResult GetAllUsers()
         {
             var users = _userService.GetAllUsers();

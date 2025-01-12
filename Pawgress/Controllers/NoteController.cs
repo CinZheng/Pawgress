@@ -27,7 +27,8 @@ namespace Pawgress.Controllers
                     DogProfileId = n.DogProfileId,
                     UserId = n.UserId,
                     Tag = n.Tag,
-                    Date = n.Date,
+                    CreationDate = n.CreationDate,
+                    UpdateDate = n.UpdateDate,
                     Description = n.Description,
                     UserName = n.User?.Username ?? "Onbekend"
                 })
@@ -47,7 +48,8 @@ namespace Pawgress.Controllers
                 DogProfileId = note.DogProfileId,
                 UserId = note.UserId,
                 Tag = note.Tag,
-                Date = note.Date,
+                CreationDate = note.CreationDate,
+                UpdateDate = note.UpdateDate,
                 Description = note.Description,
                 UserName = note.User?.Username ?? "Onbekend"
             };
@@ -66,7 +68,8 @@ namespace Pawgress.Controllers
                     DogProfileId = n.DogProfileId,
                     UserId = n.UserId,
                     Tag = n.Tag,
-                    Date = n.Date,
+                    CreationDate = n.CreationDate,
+                    UpdateDate = n.UpdateDate,
                     Description = n.Description,
                     UserName = n.User?.Username ?? "Onbekend"
                 })
@@ -83,7 +86,8 @@ namespace Pawgress.Controllers
                 DogProfileId = noteDto.DogProfileId,
                 UserId = noteDto.UserId,
                 Tag = noteDto.Tag,
-                Date = noteDto.Date,
+                CreationDate = DateTime.Now,
+                UpdateDate = DateTime.Now,
                 Description = noteDto.Description
             };
 
@@ -98,7 +102,8 @@ namespace Pawgress.Controllers
                 DogProfileId = createdNote.DogProfileId,
                 UserId = createdNote.UserId,
                 Tag = createdNote.Tag,
-                Date = createdNote.Date,
+                CreationDate = createdNote.CreationDate,
+                UpdateDate = createdNote.UpdateDate,
                 Description = createdNote.Description,
                 UserName = user?.Username ?? "Onbekend"
             });
@@ -111,7 +116,7 @@ namespace Pawgress.Controllers
             if (existingNote == null) return NotFound("Notitie niet gevonden.");
             existingNote.Description = noteDto.Description;
             existingNote.Tag = noteDto.Tag;
-            existingNote.Date = noteDto.Date;
+            existingNote.CreationDate = noteDto.CreationDate;
 
             var updatedNote = _service.Update(id, existingNote);
             return Ok(new NoteDto
@@ -120,7 +125,7 @@ namespace Pawgress.Controllers
                 DogProfileId = updatedNote.DogProfileId,
                 UserId = updatedNote.UserId,
                 Tag = updatedNote.Tag,
-                Date = updatedNote.Date,
+                UpdateDate = DateTime.Now,
                 Description = updatedNote.Description,
                 UserName = updatedNote.User?.Username ?? "Onbekend"
             });

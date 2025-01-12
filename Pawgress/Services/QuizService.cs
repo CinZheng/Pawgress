@@ -25,7 +25,7 @@ namespace Pawgress.Services
             // Laadt ook de gerelateerde QuizQuestions
             return _context.Quizzes
                 .Include(q => q.QuizQuestions)
-                .FirstOrDefault(q => q.QuizId == id);
+                .FirstOrDefault(q => q.Id == id);
         }
 
         public override List<Quiz> GetAll()

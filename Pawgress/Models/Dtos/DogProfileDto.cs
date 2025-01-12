@@ -8,5 +8,7 @@ public class DogProfileDto
     public string Image { get; set; }
     public DateTime DateOfBirth { get; set; }
     public List<string>? Notes { get; set; }
-    public List<DogSensorData>? DogSensorDatas { get; set; }
+    public List<DogSensorData>? DogSensorDatas { get; set; } 
+    public DateTime CreationDate { get; set; }
+    public DateTime UpdateDate { get; set; }
 }

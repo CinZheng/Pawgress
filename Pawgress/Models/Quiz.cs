@@ -3,14 +3,16 @@ using System.Collections.Generic;
 
 namespace Pawgress.Models
 {
-    public class Quiz
+    public class Quiz : TrainingPathItem
     {
-        public Guid QuizId { get; set; }
-        public string QuizName { get; set; }
-        public string QuizDescription { get; set; }
-        public Guid? TrainingPathId { get; set; }
-        public TrainingPath? TrainingPath { get; set; }
+        public string? Name { get; set; }
+
+        public string Description { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public List<LibraryQuiz> LibraryQuizzes { get; set; } = new List<LibraryQuiz>();
         public List<QuizQuestion>? QuizQuestions { get; set; } = new List<QuizQuestion>();
-         public int SortOrder { get; set; } // voor trainingpath
+
+
     }
 }

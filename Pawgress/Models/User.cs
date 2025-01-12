@@ -13,6 +13,8 @@ namespace Pawgress.Models
         public string? ProgressData { get; set; }
         public string Role { get; set; }
         public string PasswordHash { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
         public List<Note>? Notes { get; set; } = new List<Note>();
          public List<User_DogProfile>? DogProfiles { get; set; } = new List<User_DogProfile>();
          public List<User_TrainingPath>? TrainingPaths { get; set; } = new List<User_TrainingPath>();

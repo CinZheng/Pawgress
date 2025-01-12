@@ -46,6 +46,32 @@ public class AuthController : Controller
         return Ok("Account succesvol aangemaakt! U kunt nu inloggen.");
     }
 
+
+    [HttpPost("register-admin")]
+    public async Task<IActionResult> RegisterAdmin(RegisterDto registerDto)
+    {
+        // check if user exists
+        if (_context.Users.Any(u => u.Email == registerDto.Email))
+        {
+            return BadRequest("Email is al in gebruik.");
+        }
+
+        // add new user
+        var user = new User
+        {
+            UserId = Guid.NewGuid(),
+            Username = registerDto.Username,
+            Email = registerDto.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password), // hash password
+            Role = "admin" // standard role
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok("Account succesvol aangemaakt! U kunt nu inloggen.");
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto)
     {

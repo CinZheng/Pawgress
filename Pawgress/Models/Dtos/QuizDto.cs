@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 namespace Pawgress.Dtos
 {
-    public class QuizDto
+    public class QuizDto : TrainingPathItemDto
     {
-        public Guid? QuizId { get; set; } 
         public string QuizName { get; set; }
         public string? QuizDescription { get; set; }
         public Guid? TrainingPathId { get; set; }
         public List<QuizQuestionDto>? QuizQuestions { get; set; } = new List<QuizQuestionDto>();
-         public int SortOrder { get; set; } // voor trainingpath
+        public int SortOrder { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 
     public class QuizQuestionDto
@@ -19,5 +20,7 @@ namespace Pawgress.Dtos
         public string QuestionText { get; set; }
         public string CorrectAnswer { get; set; }
         public string? MediaUrl { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

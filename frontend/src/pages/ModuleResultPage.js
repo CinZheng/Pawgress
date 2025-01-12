@@ -1,89 +1,81 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Typography, Box, Button, Grid } from "@mui/material";
+import { Container, Typography, Box, Button, CircularProgress } from "@mui/material";
 import axiosInstance from "../axios";
 
 const ModuleResultPage = () => {
-  const { id } = useParams(); // Module ID
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [module, setModule] = useState(null);
-  const [progress, setProgress] = useState({ completed: 0, total: 0 });
+  const [moduleData, setModuleData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const userId = localStorage.getItem('userId');
 
   useEffect(() => {
-    const fetchModuleData = async () => {
+    const fetchModuleProgress = async () => {
       try {
-        const response = await axiosInstance.get(`/api/TrainingPath/${id}`);
-        const moduleData = response.data;
+        const [moduleResponse, progressResponse] = await Promise.all([
+          axiosInstance.get(`/api/TrainingPath/${id}`),
+          axiosInstance.get(`/api/TrainingPath/${id}/progress/${userId}`)
+        ]);
 
-        const totalItems = moduleData.lessons.length + moduleData.quizzes.length;
-        const completedItems = moduleData.lessons.filter((l) => l.completed).length +
-          moduleData.quizzes.filter((q) => q.completed).length;
-
-        setModule(moduleData);
-        setProgress({ completed: completedItems, total: totalItems });
+        setModuleData({
+          ...moduleResponse.data,
+          progress: progressResponse.data
+        });
       } catch (error) {
-        console.error("Fout bij ophalen moduledata:", error);
+        console.error('Error fetching module result:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchModuleData();
-  }, [id]);
+    fetchModuleProgress();
+  }, [id, userId]);
 
-  if (!module) {
+  if (loading) {
     return (
-      <Container maxWidth="md" sx={{ textAlign: "center", marginTop: "50px" }}>
-        <Typography variant="h6">Samenvatting wordt geladen...</Typography>
+      <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom>
-        Samenvatting van Module: {module.name}
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        {module.description}
-      </Typography>
-
-      <Box
-        sx={{
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "16px",
-          marginTop: "16px",
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          Resultaat
+    <Container maxWidth="sm">
+      <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Module Complete!
         </Typography>
-        <Typography variant="body1">
-          Voltooide items: {progress.completed}/{progress.total}
+        
+        <Typography variant="h5" gutterBottom>
+          {moduleData?.name}
         </Typography>
-      </Box>
 
-      <Grid container spacing={2} sx={{ marginTop: "16px" }}>
-        <Grid item xs={12} sm={6}>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Progress: {moduleData?.progress?.progress}
+        </Typography>
+
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          Status: {moduleData?.progress?.status}
+        </Typography>
+
+        {moduleData?.progress?.completionDate && (
+          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+            Completed on: {new Date(moduleData.progress.completionDate).toLocaleDateString()}
+          </Typography>
+        )}
+
+        <Box sx={{ mt: 4 }}>
           <Button
             variant="contained"
-            fullWidth
             color="primary"
-            onClick={() => navigate("/modules")}
+            onClick={() => navigate('/modules')}
+            sx={{ mr: 2 }}
           >
-            Terug naar Modules
+            Back to Modules
           </Button>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Button
-            variant="contained"
-            fullWidth
-            color="secondary"
-            onClick={() => navigate(`/modules/${id}`)}
-          >
-            Bekijk Module Opnieuw
-          </Button>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Container>
   );
 };

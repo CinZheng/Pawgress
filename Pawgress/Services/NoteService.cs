@@ -21,7 +21,7 @@ namespace Pawgress.Services
         public override Note? GetById(Guid id)
         {
             return _context.Notes
-                .Include(n => n.User) // Eager loading van de User
+                .Include(n => n.User) // Eager loading van de User, namen van notities komen anders niet op
                 .FirstOrDefault(n => n.NoteId == id);
         }
 

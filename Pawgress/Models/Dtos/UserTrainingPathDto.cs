@@ -10,5 +10,7 @@ namespace Pawgress.Dtos
         public string? Status { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? CompletionDate { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }
