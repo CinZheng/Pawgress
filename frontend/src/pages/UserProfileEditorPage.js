@@ -1,0 +1,130 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+} from '@mui/material';
+import Layout from '../components/Layout';
+import axiosInstance from '../axios';
+
+const UserProfileEditorPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+  });
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const userId = localStorage.getItem('userId');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axiosInstance.get(`/api/User/${userId}`);
+        setFormData({
+          username: response.data.username,
+          email: response.data.email,
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setError('Failed to load user data');
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axiosInstance.put(`/api/User/${userId}`, formData);
+      setMessage('Profile updated successfully');
+      setTimeout(() => navigate('/profile'), 1500);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Failed to update profile');
+    }
+  };
+
+  return (
+    <Layout>
+      <Container maxWidth="sm">
+        <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+          Profiel Bewerken
+        </Typography>
+
+        {message && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          }}
+        >
+          <TextField
+            label="Gebruikersnaam"
+            name="username"
+            value={formData.username}
+            onChange={handleInputChange}
+            fullWidth
+            required
+          />
+
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            fullWidth
+            required
+          />
+
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={() => navigate('/profile')}
+            >
+              Annuleren
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              Opslaan
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </Layout>
+  );
+};
+
+export default UserProfileEditorPage; 

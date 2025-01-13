@@ -22,14 +22,24 @@ export const isAuthenticated = () => {
 };
 
 export const isAdmin = () => {
+  console.log('=== Checking Admin Status ===');
   const token = localStorage.getItem("token");
+  console.log('Token exists:', !!token);
+  
   if (!token) return false;
 
   const decodedToken = decodeToken(token);
+  console.log('Decoded token:', decodedToken);
+  
   if (!decodedToken) return false;
 
   // gebruik sleutel om rol te vinden met behulp van URI 
   const roleKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
-  //console.log("Decoded Token Role:", decodedToken[roleKey]);
-  return decodedToken[roleKey] === "admin";
+  const role = decodedToken[roleKey];
+  console.log('User role:', role);
+  
+  const isAdminResult = role === "admin";
+  console.log('Is admin result:', isAdminResult);
+  
+  return isAdminResult;
 };

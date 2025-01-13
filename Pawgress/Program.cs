@@ -2,6 +2,10 @@ using Pawgress.Configurations;
 using Pawgress.Data;
 using Microsoft.EntityFrameworkCore;
 using Pawgress.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Pawgress.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +49,9 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder.Services.AddScoped<TrainingPathService>();
+builder.Services.AddScoped<DogSensorDataService>();
 
 var app = builder.Build();
 

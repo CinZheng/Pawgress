@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Pawgress.Data;
 using Pawgress.Models;
 using Pawgress.Services;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Pawgress.Controllers
 {
@@ -11,10 +14,12 @@ namespace Pawgress.Controllers
     public class DogProfileController : ControllerBase
     {
         private readonly DogProfileService _service;
+        private readonly ApplicationDbContext _context;
 
-        public DogProfileController(DogProfileService service)
+        public DogProfileController(DogProfileService service, ApplicationDbContext context)
         {
             _service = service;
+            _context = context;
         }
 
         [HttpGet]
@@ -99,6 +104,61 @@ namespace Pawgress.Controllers
             dogProfile.UpdateDate = DateTime.Now;
             _service.Update(id, dogProfile);
             return Ok(dogProfileDto);
+        }
+
+        [HttpPost("{dogId}/favorite/{userId}")]
+        public async Task<IActionResult> ToggleFavorite(Guid dogId, Guid userId)
+        {
+            try
+            {
+                var userDogProfile = await _context.UserDogProfiles
+                    .FirstOrDefaultAsync(udp => udp.DogProfileId == dogId && udp.UserId == userId);
+
+                if (userDogProfile == null)
+                {
+                    // Create new relationship if it doesn't exist
+                    userDogProfile = new User_DogProfile
+                    {
+                        UserId = userId,
+                        DogProfileId = dogId,
+                        IsFavorite = true,
+                        StartDate = DateTime.UtcNow,
+                        EndDate = DateTime.MaxValue,
+                        CreationDate = DateTime.UtcNow,
+                        UpdateDate = DateTime.UtcNow
+                    };
+                    _context.UserDogProfiles.Add(userDogProfile);
+                }
+                else
+                {
+                    // Toggle existing favorite status
+                    userDogProfile.IsFavorite = !userDogProfile.IsFavorite;
+                    userDogProfile.UpdateDate = DateTime.UtcNow;
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(new { isFavorite = userDogProfile.IsFavorite });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("{dogId}/favorite/{userId}")]
+        public async Task<IActionResult> GetFavoriteStatus(Guid dogId, Guid userId)
+        {
+            try
+            {
+                var userDogProfile = await _context.UserDogProfiles
+                    .FirstOrDefaultAsync(udp => udp.DogProfileId == dogId && udp.UserId == userId);
+
+                return Ok(new { isFavorite = userDogProfile?.IsFavorite ?? false });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]

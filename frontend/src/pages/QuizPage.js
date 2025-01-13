@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -12,6 +12,9 @@ import axiosInstance from "../axios";
 const QuizPage = () => {
   const { id } = useParams(); 
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const moduleId = queryParams.get("moduleId");
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -40,7 +43,11 @@ const QuizPage = () => {
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      navigate("/library");
+      if (moduleId) {
+        navigate(`/modules/${moduleId}`);
+      } else {
+        navigate("/library");
+      }
     }
   };
 

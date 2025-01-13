@@ -4,6 +4,8 @@ import { Container, Typography, Box, Button, Alert, FormControlLabel, Checkbox }
 import axiosInstance from "../axios";
 import { isAdmin } from "../utils/auth";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ModuleDetailsPage = () => {
   const { id } = useParams();
@@ -12,9 +14,10 @@ const ModuleDetailsPage = () => {
   const [moduleDescription, setModuleDescription] = useState("");
   const [orderedItems, setOrderedItems] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [error, setError] = useState("");
   const [progress, setProgress] = useState(null);
   const [itemProgress, setItemProgress] = useState([]);
+  const [error, setError] = useState("");
+  const [hasStarted, setHasStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressPercentage, setProgressPercentage] = useState(0);
 
@@ -196,64 +199,141 @@ const ModuleDetailsPage = () => {
   const { details, trainingPathItem } = currentItem;
   const isLesson = trainingPathItem.type === "Lesson";
 
-  return (
-    <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom>
-        Module: {moduleName}
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        {moduleDescription}
-      </Typography>
-      {!userIsAdmin && progress && (
-        <Box sx={{ mt: 2, mb: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Progress
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ 
-              width: '100%', 
-              height: 10, 
-              bgcolor: '#e0e0e0',
-              borderRadius: 5,
-              position: 'relative'
-            }}>
-              <Box sx={{
-                width: `${progress.percentageComplete || 0}%`,
-                height: '100%',
-                bgcolor: 'primary.main',
-                borderRadius: 5,
-                transition: 'width 0.5s ease-in-out'
-              }} />
-            </Box>
-            <Typography variant="body2" color="textSecondary">
-              {Math.round(progress.percentageComplete || 0)}%
-            </Typography>
-          </Box>
-          <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-            {progress.completedItems || 0} of {progress.totalItems || 0} items completed
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Status: {progress.status || "Not Started"}
-          </Typography>
-          {progress.status === "Completed" && (
-            <Alert severity="success" sx={{ mt: 2 }}>
-              Module Completed! 
-              {progress.completionDate && (
-                <span> Completed on: {new Date(progress.completionDate).toLocaleDateString()}</span>
-              )}
-            </Alert>
-          )}
-        </Box>
-      )}
-
-      <Box
-        sx={{
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "16px",
-          marginTop: "16px",
+  // Overview Page
+  if (!hasStarted) {
+    return (
+      <Container 
+        maxWidth="md" 
+        sx={{ 
+          mt: 8, // Add top margin
+          mb: 4, // Add bottom margin
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '80vh' // Ensure consistent minimum height
         }}
       >
+        <Typography variant="h4" gutterBottom>
+          Module: {moduleName}
+        </Typography>
+        <Typography variant="body1" gutterBottom sx={{ mb: 4 }}>
+          {moduleDescription}
+        </Typography>
+
+        {/* Module Contents Section */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Module Contents
+          </Typography>
+          {orderedItems.map((item, index) => (
+            <Box 
+              key={item.trainingPathItem.id}
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 1,
+                p: 2,
+                border: '1px solid #e0e0e0',
+                borderRadius: 1
+              }}
+            >
+              <Typography sx={{ flex: 1 }}>
+                {index + 1}. {item.details.name || item.details.quizName}
+                {' '}
+                <Typography component="span" color="textSecondary">
+                  ({item.trainingPathItem.type})
+                </Typography>
+              </Typography>
+              {itemProgress?.find(ip => ip.itemId === item.trainingPathItem.id)?.isCompleted && (
+                <CheckCircleIcon color="success" sx={{ ml: 1 }} />
+              )}
+            </Box>
+          ))}
+        </Box>
+
+        {/* Progress Section */}
+        {!userIsAdmin && progress && (
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h5" gutterBottom>
+              Your Progress
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ 
+                width: '100%', 
+                height: 10, 
+                bgcolor: '#e0e0e0',
+                borderRadius: 5,
+                position: 'relative'
+              }}>
+                <Box sx={{
+                  width: `${progress.percentageComplete || 0}%`,
+                  height: '100%',
+                  bgcolor: 'primary.main',
+                  borderRadius: 5,
+                  transition: 'width 0.5s ease-in-out'
+                }} />
+              </Box>
+              <Typography variant="body2" color="textSecondary">
+                {Math.round(progress.percentageComplete || 0)}%
+              </Typography>
+            </Box>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {progress.completedItems || 0} of {progress.totalItems || 0} items completed
+            </Typography>
+            <Typography variant="body2">
+              Status: {progress.status}
+            </Typography>
+            {progress.startDate && (
+              <Typography variant="body2">
+                Started: {new Date(progress.startDate).toLocaleDateString()}
+              </Typography>
+            )}
+            {progress.completionDate && (
+              <Typography variant="body2">
+                Completed: {new Date(progress.completionDate).toLocaleDateString()}
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {/* Action Buttons */}
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={() => setHasStarted(true)}
+            startIcon={<PlayArrowIcon />}
+          >
+            {progress?.status === "In Progress" ? "Continue Module" : "Start Module"}
+          </Button>
+          {userIsAdmin && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate(`/module-editor?id=${id}`)}
+            >
+              Edit Module
+            </Button>
+          )}
+        </Box>
+      </Container>
+    );
+  }
+
+  // Module Content Page
+  return (
+    <Container 
+      maxWidth="md" 
+      sx={{ 
+        mt: 8, // Add top margin
+        mb: 4, // Add bottom margin
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '80vh' // Ensure consistent minimum height
+      }}
+    >
+      {/* Current Item Content */}
+      <Box sx={{ mb: 4 }}>
         {isLesson ? (
           <Box>
             <Typography variant="h5">
@@ -283,15 +363,27 @@ const ModuleDetailsPage = () => {
           </Box>
         )}
       </Box>
+
+      {/* Navigation Buttons */}
       <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "16px" }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleBack}
-          disabled={currentIndex === 0}
-        >
-          Back
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setHasStarted(false)}
+            startIcon={<ArrowBackIcon />}
+          >
+            Back to Overview
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleBack}
+            disabled={currentIndex === 0}
+          >
+            Previous
+          </Button>
+        </Box>
         {!userIsAdmin && (
           <Button
             variant="contained"
@@ -343,18 +435,6 @@ const ModuleDetailsPage = () => {
           {currentIndex + 1 < orderedItems.length ? "Next" : "Back to Overview"}
         </Button>
       </Box>
-
-      {/* Admin-only Edit Button */}
-      {userIsAdmin && (
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => navigate(`/module-editor?id=${id}`)}
-          sx={{ marginTop: "16px" }}
-        >
-          Edit Module
-        </Button>
-      )}
     </Container>
   );
 };

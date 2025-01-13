@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import QuizEditorPage from "./pages/QuizEditorPage";
 import LessonEditorPage from "./pages/LessonEditorPage";
 import LessonOverviewPage from "./pages/LessonOverviewPage";
@@ -9,7 +9,6 @@ import ModuleOverviewPage from "./pages/ModuleOverviewPage";
 import ModuleDetailsPage from "./pages/ModuleDetailsPage";
 import DogprofileOverviewPage from "./pages/DogProfileOverviewPage";
 import DogprofileDetailsPage from "./pages/DogProfileDetailsPage";
-import ProfilePage from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
@@ -18,11 +17,13 @@ import { isAuthenticated } from "./utils/auth";
 import { isAdmin } from "./utils/auth";
 import DogProfileEditorPage from "./pages/DogProfileEditorPage";
 import SensorDataForm from "./pages/SensorDataForm";
-import SensorDataPage from "./pages/SensorDataPage";
 import QuizPage from "./pages/QuizPage";
 import QuizDetailsPage from "./pages/QuizDetailsPage";
 import ModuleEditorPage from "./pages/ModuleEditorPage";
 import ModuleResultPage from "./pages/ModuleResultPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import UserProfileEditorPage from "./pages/UserProfileEditorPage";
+import DogSensorDataPage from './pages/DogSensorDataPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
@@ -34,8 +35,13 @@ function App() {
 
   return (
     <Router>
-      <NavbarWrapper isLoggedIn={isLoggedIn} />
+      <Navbar isLoggedIn={isLoggedIn} />
       <Routes>
+        {/* Root route redirect */}
+        <Route path="/" element={
+          isLoggedIn ? <Navigate to="/modules" replace /> : <Navigate to="/login" replace />
+        } />
+
         {/* Openbare routes */}
         <Route path="/login" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -53,7 +59,15 @@ function App() {
           path="/profile"
           element={
             <PrivateRoute>
-              <ProfilePage />
+              <UserProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <PrivateRoute>
+              <UserProfileEditorPage />
             </PrivateRoute>
           }
         />
@@ -179,31 +193,25 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route 
-          path="/sensor-data-form" 
+        <Route
+          path="/sensor-data-form"
           element={
-            <SensorDataForm />
-          } 
-        />
-        <Route 
-          path="/sensor-data" 
-          element={
-            <SensorDataPage />
+            <PrivateRoute>
+              {isAdmin() ? (
+                <SensorDataForm />
+              ) : (
+                <div>U heeft geen toegang tot deze pagina.</div>
+              )}
+            </PrivateRoute>
           }
         />
+        <Route path="/dogprofiles/:dogProfileId/sensor-data" element={<DogSensorDataPage />} />
+
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
 }
-
-const NavbarWrapper = ({ isLoggedIn }) => {
-  const location = useLocation(); // gebruik de hook binnen Router-context
-  const hideNavbarRoutes = ["/login", "/register"];
-  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
-
-  if (!isLoggedIn || shouldHideNavbar) return null; // verberg Navbar op specifieke routes of als niet ingelogd
-
-  return <Navbar />;
-};
 
 export default App;
