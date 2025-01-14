@@ -44,6 +44,7 @@ const QuizDetailsPage = () => {
   return (
     <Layout>
       <Container maxWidth="md">
+      <Box sx={{ mt: 4, mb: 6 }}>
         <Typography variant="h4" gutterBottom>
           {quiz.quizName}
         </Typography>
@@ -59,7 +60,7 @@ const QuizDetailsPage = () => {
             {quiz.quizDescription || "Geen beschrijving"}
           </Typography>
         </Box>
-
+        </Box>
         {isUserAdmin && (
           <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
             <Button variant="contained" color="primary" onClick={() => navigate(`/quiz-editor?id=${id}`)}>

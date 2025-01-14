@@ -447,12 +447,12 @@ namespace Pawgress.Controllers
                 await _context.SaveChangesAsync();
 
                 // Update User_TrainingPath record
-                var userTrainingPath = await _context.UserTrainingPaths
+            var userTrainingPath = await _context.UserTrainingPaths
                     .FirstOrDefaultAsync(utp => utp.TrainingPathId == request.TrainingPathId && utp.UserId == userId);
 
                 if (userTrainingPath != null)
                 {
-                    var totalItems = await _context.TrainingPathItemOrders
+            var totalItems = await _context.TrainingPathItemOrders
                         .CountAsync(tpio => tpio.TrainingPathId == request.TrainingPathId);
 
                     var completedItems = await _context.UserProgress
@@ -460,13 +460,13 @@ namespace Pawgress.Controllers
                                         up.UserId == userId && 
                                         up.IsCompleted);
 
-                    userTrainingPath.Progress = $"{completedItems}/{totalItems}";
+            userTrainingPath.Progress = $"{completedItems}/{totalItems}";
                     userTrainingPath.Status = completedItems == 0 ? "Not Started" : 
                                             completedItems == totalItems ? "Completed" : "In Progress";
                     userTrainingPath.CompletionDate = completedItems == totalItems ? DateTime.UtcNow : null;
-                    userTrainingPath.UpdateDate = DateTime.UtcNow;
+            userTrainingPath.UpdateDate = DateTime.UtcNow;
 
-                    await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
                 }
 
                 // Get and return updated progress

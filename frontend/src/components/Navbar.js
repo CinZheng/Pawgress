@@ -49,9 +49,11 @@ function Navbar({ isLoggedIn }) {
           bottom: 0,
           left: 0,
           right: 0,
-          zIndex: 1000,
+          zIndex: 1100,
           backgroundColor: "white",
-          borderTop: "1px solid rgba(0, 0, 0, 0.12)"
+          borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+          height: "64px",
+          boxShadow: "0px -2px 4px rgba(0, 0, 0, 0.1)"
         }}
       >
         {navigationItems.map((item) => (
@@ -62,6 +64,13 @@ function Navbar({ isLoggedIn }) {
             component={Link}
             to={item.path}
             value={item.path}
+            sx={{
+              minWidth: 0,
+              padding: "6px 0",
+              '& .MuiBottomNavigationAction-label': {
+                fontSize: '0.75rem'
+              }
+            }}
           />
         ))}
       </BottomNavigation>
@@ -69,20 +78,32 @@ function Navbar({ isLoggedIn }) {
   }
 
   return (
-    <AppBar position="static" color="primary">
-      <Toolbar sx={{ gap: 2 }}>
-        <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
+    <AppBar 
+      position="fixed" 
+      sx={{ 
+        backgroundColor: "white",
+        color: "text.primary",
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"
+      }}
+    >
+      <Toolbar sx={{ minHeight: { xs: "56px", sm: "64px" } }}>
+        <Box sx={{ display: 'flex', gap: 3, flexGrow: 1 }}>
           {navigationItems.map((item) => (
             <Typography
               key={item.path}
               component={Link}
               to={item.path}
               sx={{
-                color: "white",
+                color: location.pathname === item.path ? "primary.main" : "text.primary",
                 textDecoration: "none",
                 display: "flex",
                 alignItems: "center",
-                gap: 1
+                gap: 1,
+                fontSize: "0.9rem",
+                fontWeight: location.pathname === item.path ? 600 : 400,
+                '&:hover': {
+                  color: "primary.main"
+                }
               }}
             >
               {item.icon}
@@ -91,9 +112,14 @@ function Navbar({ isLoggedIn }) {
           ))}
         </Box>
         <Button
-          color="inherit"
           onClick={handleLogout}
           startIcon={<LogoutIcon />}
+          sx={{
+            color: "text.primary",
+            '&:hover': {
+              color: "primary.main"
+            }
+          }}
         >
           Uitloggen
         </Button>

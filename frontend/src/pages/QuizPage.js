@@ -8,6 +8,7 @@ import {
   Alert,
 } from "@mui/material";
 import axiosInstance from "../axios";
+import Layout from "../components/Layout";
 
 const QuizPage = () => {
   const { id } = useParams(); 
@@ -53,87 +54,100 @@ const QuizPage = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ textAlign: "center", marginTop: "50px" }}>
-        <Typography variant="h6">Quiz wordt geladen...</Typography>
-      </Container>
+      <Layout>
+        <Container maxWidth="md">
+          <Box sx={{ mt: 4 }}>
+            <Typography>Quiz wordt geladen...</Typography>
+          </Box>
+        </Container>
+      </Layout>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ marginTop: "50px" }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
+      <Layout>
+        <Container maxWidth="md">
+          <Box sx={{ mt: 4 }}>
+            <Alert severity="error">{error}</Alert>
+          </Box>
+        </Container>
+      </Layout>
     );
   }
 
   if (!questions.length) {
     return (
-      <Container maxWidth="md" sx={{ marginTop: "50px" }}>
-        <Typography variant="h6">Geen vragen beschikbaar voor deze quiz.</Typography>
-      </Container>
+      <Layout>
+        <Container maxWidth="md">
+          <Box sx={{ mt: 4 }}>
+            <Typography>Geen vragen beschikbaar voor deze quiz.</Typography>
+          </Box>
+        </Container>
+      </Layout>
     );
   }
 
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom>
-        Quiz
-      </Typography>
-      <Box
-        sx={{
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "16px",
-          backgroundColor: "#f9f9f9",
-          marginBottom: "16px",
-        }}
-      >
-        <Typography variant="h6">Vraag {currentQuestionIndex + 1}</Typography>
-        <Typography variant="body1" sx={{ marginTop: 2 }}>
-          {currentQuestion.questionText}
-        </Typography>
-        {currentQuestion.mediaUrl && (
-          <Box sx={{ marginTop: 2 }}>
-            <img
-              src={currentQuestion.mediaUrl}
-              alt="Media"
-              style={{ maxWidth: "100%" }}
-            />
+    <Layout>
+      <Container maxWidth="md">
+        <Box sx={{ mt: 4, mb: 6 }}>
+          <Box
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              padding: "16px",
+              backgroundColor: "#f9f9f9",
+              marginBottom: "16px",
+            }}
+          >
+            <Typography variant="h6">Vraag {currentQuestionIndex + 1}</Typography>
+            <Typography variant="body1" sx={{ marginTop: 2 }}>
+              {currentQuestion.questionText}
+            </Typography>
+            {currentQuestion.mediaUrl && (
+              <Box sx={{ marginTop: 2 }}>
+                <img
+                  src={currentQuestion.mediaUrl}
+                  alt="Media"
+                  style={{ maxWidth: "100%" }}
+                />
+              </Box>
+            )}
+            {showAnswer && (
+              <Typography
+                variant="body2"
+                sx={{ marginTop: 2, color: "green", fontWeight: "bold" }}
+              >
+                Correct Antwoord: {currentQuestion.correctAnswer}
+              </Typography>
+            )}
           </Box>
-        )}
-        {showAnswer && (
-          <Typography
-            variant="body2"
-            sx={{ marginTop: 2, color: "green", fontWeight: "bold" }}
-          >
-            Correct Antwoord: {currentQuestion.correctAnswer}
-          </Typography>
-        )}
-      </Box>
-      <Box sx={{ display: "flex", gap: 2 }}>
-        {!showAnswer && (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setShowAnswer(true)}
-          >
-            Toon Antwoord
-          </Button>
-        )}
-        {showAnswer && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNextQuestion}
-          >
-            Volgende Vraag
-          </Button>
-        )}
-      </Box>
-    </Container>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            {!showAnswer && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setShowAnswer(true)}
+              >
+                Toon Antwoord
+              </Button>
+            )}
+            {showAnswer && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleNextQuestion}
+              >
+                Volgende Vraag
+              </Button>
+            )}
+          </Box>
+        </Box>
+      </Container>
+    </Layout>
   );
 };
 
