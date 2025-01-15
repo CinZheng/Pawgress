@@ -207,9 +207,9 @@ const DogProfileDetailsPage = () => {
   
   return (
     <Layout>
-      <Container maxWidth="md">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Typography variant="h4">
+      <Container maxWidth="lg">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+          <Typography variant="h4" component="h1">
             {dogProfile.name}
           </Typography>
           <IconButton 
@@ -226,12 +226,14 @@ const DogProfileDetailsPage = () => {
             <PetsIcon />
           </IconButton>
         </Box>
+        
         <Box
           sx={{
             border: "1px solid #ccc",
             borderRadius: "4px",
             padding: "16px",
             backgroundColor: "#f9f9f9",
+            mb: 4
           }}
         >
           <Typography variant="body1">

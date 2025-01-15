@@ -18,16 +18,10 @@ import DataSensorIcon from '@mui/icons-material/DataUsage';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { isAdmin } from "../utils/auth";
 
-function Navbar({ isLoggedIn }) {
+function Navbar({ isLoggedIn, onLogout }) {
   const isMobile = useMediaQuery("(max-width:600px)");
   const location = useLocation();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    navigate("/login");
-  };
 
   const navigationItems = [
     { label: "Modules", icon: <HomeIcon />, path: "/modules" },
@@ -92,7 +86,7 @@ function Navbar({ isLoggedIn }) {
         </Box>
         <Button
           color="inherit"
-          onClick={handleLogout}
+          onClick={onLogout}
           startIcon={<LogoutIcon />}
         >
           Uitloggen

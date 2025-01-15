@@ -6,8 +6,10 @@ import {
   Button,
   Box,
   Alert,
+  TextField,
 } from "@mui/material";
 import axiosInstance from "../axios";
+import Layout from "../components/Layout";
 
 const QuizPage = () => {
   const { id } = useParams(); 
@@ -20,6 +22,10 @@ const QuizPage = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [userAnswer, setUserAnswer] = useState("");
+  const [savedAnswer, setSavedAnswer] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -38,8 +44,36 @@ const QuizPage = () => {
     fetchQuestions();
   }, [id]);
 
+  useEffect(() => {
+    const fetchSavedAnswer = async () => {
+      if (!questions[currentQuestionIndex]) return;
+      
+      try {
+        const response = await axiosInstance.get(
+          `/api/Quiz/questions/${questions[currentQuestionIndex].quizQuestionId}/answer/${userId}`
+        );
+        setSavedAnswer(response.data);
+        setUserAnswer(response.data.userAnswer);
+        setShowAnswer(true);
+      } catch (err) {
+        if (err.response?.status !== 404) {
+          console.error("Error fetching saved answer:", err);
+        }
+        setSavedAnswer(null);
+        setUserAnswer("");
+        setShowAnswer(false);
+      }
+      setIsEditing(false);
+    };
+
+    fetchSavedAnswer();
+  }, [currentQuestionIndex, questions, userId]);
+
   const handleNextQuestion = () => {
     setShowAnswer(false);
+    setUserAnswer("");
+    setSavedAnswer(null);
+    setIsEditing(false);
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
@@ -51,89 +85,151 @@ const QuizPage = () => {
     }
   };
 
+  const handleSubmitAnswer = async () => {
+    if (!userAnswer.trim()) return;
+
+    try {
+      const response = await axiosInstance.post(
+        `/api/Quiz/questions/${questions[currentQuestionIndex].quizQuestionId}/answer`,
+        {
+          userId: userId,
+          answer: userAnswer
+        }
+      );
+      setSavedAnswer(response.data);
+      setShowAnswer(true);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Error saving answer:", err);
+      setError("Kon antwoord niet opslaan.");
+    }
+  };
+
+  const handleEditAnswer = () => {
+    setIsEditing(true);
+    setShowAnswer(false);
+  };
+
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ textAlign: "center", marginTop: "50px" }}>
-        <Typography variant="h6">Quiz wordt geladen...</Typography>
-      </Container>
+      <Layout>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: "center" }}>
+            <Typography variant="h6">Quiz wordt geladen...</Typography>
+          </Box>
+        </Container>
+      </Layout>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ marginTop: "50px" }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
+      <Layout>
+        <Container maxWidth="lg">
+          <Alert severity="error">{error}</Alert>
+        </Container>
+      </Layout>
     );
   }
 
   if (!questions.length) {
     return (
-      <Container maxWidth="md" sx={{ marginTop: "50px" }}>
-        <Typography variant="h6">Geen vragen beschikbaar voor deze quiz.</Typography>
-      </Container>
+      <Layout>
+        <Container maxWidth="lg">
+          <Typography variant="h6">Geen vragen beschikbaar voor deze quiz.</Typography>
+        </Container>
+      </Layout>
     );
   }
 
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom>
-        Quiz
-      </Typography>
-      <Box
-        sx={{
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "16px",
-          backgroundColor: "#f9f9f9",
-          marginBottom: "16px",
-        }}
-      >
-        <Typography variant="h6">Vraag {currentQuestionIndex + 1}</Typography>
-        <Typography variant="body1" sx={{ marginTop: 2 }}>
-          {currentQuestion.questionText}
+    <Layout>
+      <Container maxWidth="lg">
+        <Typography variant="h4" component="h1" gutterBottom>
+          Quiz
         </Typography>
-        {currentQuestion.mediaUrl && (
-          <Box sx={{ marginTop: 2 }}>
-            <img
-              src={currentQuestion.mediaUrl}
-              alt="Media"
-              style={{ maxWidth: "100%" }}
-            />
-          </Box>
-        )}
-        {showAnswer && (
-          <Typography
-            variant="body2"
-            sx={{ marginTop: 2, color: "green", fontWeight: "bold" }}
-          >
-            Correct Antwoord: {currentQuestion.correctAnswer}
+        <Box
+          sx={{
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            padding: 3,
+            backgroundColor: "#f9f9f9",
+            mb: 4,
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            Vraag {currentQuestionIndex + 1} van {questions.length}
           </Typography>
-        )}
-      </Box>
-      <Box sx={{ display: "flex", gap: 2 }}>
-        {!showAnswer && (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setShowAnswer(true)}
-          >
-            Toon Antwoord
-          </Button>
-        )}
-        {showAnswer && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNextQuestion}
-          >
-            Volgende Vraag
-          </Button>
-        )}
-      </Box>
-    </Container>
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            {currentQuestion.questionText}
+          </Typography>
+          {currentQuestion.mediaUrl && (
+            <Box sx={{ mt: 3 }}>
+              <img
+                src={currentQuestion.mediaUrl}
+                alt="Media"
+                style={{ maxWidth: "100%" }}
+              />
+            </Box>
+          )}
+
+          {(!showAnswer || isEditing) && (
+            <Box sx={{ mt: 3 }}>
+              <TextField
+                fullWidth
+                label="Jouw antwoord"
+                variant="outlined"
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmitAnswer}
+                sx={{ mt: 2 }}
+                disabled={!userAnswer.trim()}
+              >
+                {savedAnswer ? "Antwoord Bijwerken" : "Antwoord Indienen"}
+              </Button>
+            </Box>
+          )}
+
+          {showAnswer && !isEditing && (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="body1" sx={{ mt: 1 }}>
+                Jouw antwoord: {savedAnswer?.userAnswer}
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 1 }}>
+                Het antwoord moeten de volgende punten bevatten: {currentQuestion.correctAnswer}
+              </Typography>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleEditAnswer}
+                sx={{ mt: 2 }}
+              >
+                Antwoord Aanpassen
+              </Button>
+            </Box>
+          )}
+        </Box>
+
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
+          {showAnswer && !isEditing && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={handleNextQuestion}
+            >
+              {currentQuestionIndex + 1 < questions.length ? "Volgende Vraag" : "Quiz Afronden"}
+            </Button>
+          )}
+        </Box>
+      </Container>
+    </Layout>
   );
 };
 

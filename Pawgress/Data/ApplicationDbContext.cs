@@ -14,6 +14,7 @@ namespace Pawgress.Data
         public DbSet<Note> Notes { get; set; }
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<QuizQuestion> Questions { get; set; }
+        public DbSet<QuizAnswer> QuizAnswers { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Library> Libraries { get; set; }
@@ -163,6 +164,19 @@ namespace Pawgress.Data
                 .HasOne(up => up.TrainingPath)
                 .WithMany()
                 .HasForeignKey(up => up.TrainingPathId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure QuizAnswer relationships
+            modelBuilder.Entity<QuizAnswer>()
+                .HasOne(qa => qa.User)
+                .WithMany()
+                .HasForeignKey(qa => qa.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuizAnswer>()
+                .HasOne(qa => qa.QuizQuestion)
+                .WithMany()
+                .HasForeignKey(qa => qa.QuizQuestionId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

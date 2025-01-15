@@ -43,8 +43,8 @@ const QuizDetailsPage = () => {
 
   return (
     <Layout>
-      <Container maxWidth="md">
-        <Typography variant="h4" gutterBottom>
+      <Container maxWidth="lg">
+        <Typography variant="h4" component="h1" gutterBottom>
           {quiz.quizName}
         </Typography>
         <Box
@@ -53,15 +53,16 @@ const QuizDetailsPage = () => {
             borderRadius: "4px",
             padding: "16px",
             backgroundColor: "#f9f9f9",
+            mb: 4
           }}
         >
-          <Typography variant="body1" sx={{ marginBottom: 2 }}>
+          <Typography variant="body1" sx={{ mb: 2 }}>
             {quiz.quizDescription || "Geen beschrijving"}
           </Typography>
         </Box>
 
         {isUserAdmin && (
-          <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+          <Box sx={{ display: "flex", gap: 2, mb: 4 }}>
             <Button variant="contained" color="primary" onClick={() => navigate(`/quiz-editor?id=${id}`)}>
               Bewerken
             </Button>
@@ -74,7 +75,6 @@ const QuizDetailsPage = () => {
         <Button
           variant="contained"
           color="secondary"
-          sx={{ marginTop: 2 }}
           onClick={() => navigate(`/quiz/${id}`)}
         >
           Start Quiz

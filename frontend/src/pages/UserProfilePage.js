@@ -11,9 +11,11 @@ import {
   LinearProgress,
   Divider,
   Avatar,
+  useMediaQuery,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import PetsIcon from '@mui/icons-material/Pets';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Layout from '../components/Layout';
 import axiosInstance from '../axios';
 
@@ -23,6 +25,13 @@ const UserProfilePage = () => {
   const [modules, setModules] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const userId = localStorage.getItem('userId');
+  const isMobile = useMediaQuery('(max-width:600px)');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    navigate('/login');
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -48,7 +57,7 @@ const UserProfilePage = () => {
 
   return (
     <Layout>
-      <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+      <Container maxWidth="lg">
         {/* User Info Section */}
         <Box sx={{ 
           display: 'flex', 
@@ -60,32 +69,45 @@ const UserProfilePage = () => {
             sx={{
               width: 120,
               height: 120,
-              mb: 2,
+              mb: 3,
               bgcolor: 'primary.main',
               fontSize: '3rem'
             }}
           >
             {userProfile?.username?.charAt(0)?.toUpperCase()}
           </Avatar>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" component="h1" gutterBottom>
             {userProfile?.username}
           </Typography>
           <Typography variant="body1" color="textSecondary" gutterBottom>
             {userProfile?.email}
           </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<EditIcon />}
-            onClick={() => navigate('/profile/edit')}
-            sx={{ mt: 2 }}
-          >
-            Profiel Bewerken
-          </Button>
+          <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 2, width: isMobile ? '100%' : 'auto' }}>
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              onClick={() => navigate('/profile/edit')}
+              fullWidth={isMobile}
+            >
+              Profiel Bewerken
+            </Button>
+            {isMobile && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<LogoutIcon />}
+                onClick={handleLogout}
+                fullWidth
+              >
+                Uitloggen
+              </Button>
+            )}
+          </Box>
         </Box>
 
         {/* Favorite Dogs Section */}
-        <Typography variant="h5" gutterBottom>
-          <PetsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+        <Typography variant="h5" component="h2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <PetsIcon />
           Favoriete Honden
         </Typography>
         <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -132,7 +154,8 @@ const UserProfilePage = () => {
         <Divider sx={{ my: 4 }} />
 
         {/* Modules Section */}
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h5" component="h2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <PetsIcon />
           Mijn Modules
         </Typography>
         <Grid container spacing={3}>

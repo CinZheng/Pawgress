@@ -26,16 +26,38 @@ import UserProfileEditorPage from "./pages/UserProfileEditorPage";
 import DogSensorDataPage from './pages/DogSensorDataPage';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Controleer de loginstatus opnieuw wanneer de component mount
   useEffect(() => {
+    // Initial check
     setIsLoggedIn(isAuthenticated());
+
+    // Set up an interval to check authentication status
+    const checkAuthStatus = () => {
+      const authStatus = isAuthenticated();
+      setIsLoggedIn(authStatus);
+    };
+
+    // Check auth status every 1 second
+    const interval = setInterval(checkAuthStatus, 1000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    setIsLoggedIn(false);
+  };
 
   return (
     <Router>
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <Routes>
         {/* Root route redirect */}
         <Route path="/" element={
@@ -43,7 +65,7 @@ function App() {
         } />
 
         {/* Openbare routes */}
-        <Route path="/login" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Beveiligde routes */}

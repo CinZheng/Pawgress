@@ -5,6 +5,7 @@ using Pawgress.Models;
 using Pawgress.Services;
 using System;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Pawgress.Controllers
 {
@@ -182,6 +183,90 @@ namespace Pawgress.Controllers
             _context.SaveChanges();
 
             return Ok("Quiz succesvol verwijderd.");
+        }
+
+        [HttpGet("questions/{questionId}/answer/{userId}")]
+        public async Task<IActionResult> GetUserAnswer(Guid questionId, Guid userId)
+        {
+            var answer = await _context.QuizAnswers
+                .FirstOrDefaultAsync(qa => qa.QuizQuestionId == questionId && qa.UserId == userId);
+
+            if (answer == null)
+                return NotFound();
+
+            return Ok(new QuizAnswerDto
+            {
+                QuizAnswerId = answer.QuizAnswerId,
+                UserId = answer.UserId,
+                QuizQuestionId = answer.QuizQuestionId,
+                UserAnswer = answer.UserAnswer,
+                IsCorrect = answer.IsCorrect,
+                CreationDate = answer.CreationDate,
+                UpdateDate = answer.UpdateDate
+            });
+        }
+
+        [HttpPost("questions/{questionId}/answer")]
+        public async Task<IActionResult> SaveAnswer(Guid questionId, [FromBody] SaveAnswerRequest request)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+                return NotFound("Question not found");
+
+            var existingAnswer = await _context.QuizAnswers
+                .FirstOrDefaultAsync(qa => qa.QuizQuestionId == questionId && qa.UserId == request.UserId);
+
+            if (existingAnswer != null)
+            {
+                // Update existing answer
+                existingAnswer.UserAnswer = request.Answer;
+                existingAnswer.IsCorrect = request.Answer.Equals(question.CorrectAnswer, StringComparison.OrdinalIgnoreCase);
+                existingAnswer.UpdateDate = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                return Ok(new QuizAnswerDto
+                {
+                    QuizAnswerId = existingAnswer.QuizAnswerId,
+                    UserId = existingAnswer.UserId,
+                    QuizQuestionId = existingAnswer.QuizQuestionId,
+                    UserAnswer = existingAnswer.UserAnswer,
+                    IsCorrect = existingAnswer.IsCorrect,
+                    CreationDate = existingAnswer.CreationDate,
+                    UpdateDate = existingAnswer.UpdateDate
+                });
+            }
+
+            // Create new answer
+            var newAnswer = new QuizAnswer
+            {
+                QuizAnswerId = Guid.NewGuid(),
+                UserId = request.UserId,
+                QuizQuestionId = questionId,
+                UserAnswer = request.Answer,
+                IsCorrect = request.Answer.Equals(question.CorrectAnswer, StringComparison.OrdinalIgnoreCase),
+                CreationDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow
+            };
+
+            _context.QuizAnswers.Add(newAnswer);
+            await _context.SaveChangesAsync();
+
+            return Ok(new QuizAnswerDto
+            {
+                QuizAnswerId = newAnswer.QuizAnswerId,
+                UserId = newAnswer.UserId,
+                QuizQuestionId = newAnswer.QuizQuestionId,
+                UserAnswer = newAnswer.UserAnswer,
+                IsCorrect = newAnswer.IsCorrect,
+                CreationDate = newAnswer.CreationDate,
+                UpdateDate = newAnswer.UpdateDate
+            });
+        }
+
+        public class SaveAnswerRequest
+        {
+            public Guid UserId { get; set; }
+            public string Answer { get; set; }
         }
     }
 }
