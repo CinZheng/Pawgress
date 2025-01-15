@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Typography, Box, Button, Alert, FormControlLabel, Checkbox, Paper, Card, CardContent } from "@mui/material";
+import { Container, Typography, Box, Button, Alert, FormControlLabel, Checkbox } from "@mui/material";
 import axiosInstance from "../axios";
 import { isAdmin } from "../utils/auth";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { marked } from "marked";
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 const ModuleDetailsPage = () => {
   const { id } = useParams();
@@ -164,7 +162,6 @@ const ModuleDetailsPage = () => {
   if (orderedItems.length === 0) {
     return (
       <Container maxWidth="md">
-        <Box sx={{ mt: 4, mb: 6 }}>
         <Typography variant="h4" gutterBottom>
           Module: {moduleName}
         </Typography>
@@ -194,7 +191,6 @@ const ModuleDetailsPage = () => {
             Edit Module
           </Button>
         )}
-        </Box>
       </Container>
     );
   }
@@ -209,125 +205,49 @@ const ModuleDetailsPage = () => {
       <Container 
         maxWidth="md" 
         sx={{ 
-          mt: 4,
-          mb: 4,
+          mt: 8, // Add top margin
+          mb: 4, // Add bottom margin
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '80vh'
+          minHeight: '80vh' // Ensure consistent minimum height
         }}
       >
-        {/* Module Header Card */}
-        <Card 
-          sx={{
-            backgroundColor: '#663366',
-            borderRadius: '12px',
-            mb: 4
-          }}
-        >
-          <CardContent sx={{ p: 3 }}>
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                color: 'white',
-                fontWeight: 'bold',
-                mb: 1
-              }}
-            >
-              {moduleName}
-            </Typography>
-            <Typography 
-              sx={{ 
-                color: 'white',
-                opacity: 0.9,
-                fontStyle: 'italic'
-              }}
-            >
-              {moduleDescription}
-            </Typography>
-          </CardContent>
-        </Card>
+        <Typography variant="h4" gutterBottom>
+          Module: {moduleName}
+        </Typography>
+        <Typography variant="body1" gutterBottom sx={{ mb: 4 }}>
+          {moduleDescription}
+        </Typography>
 
         {/* Module Contents Section */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h5" gutterBottom>
             Module Contents
           </Typography>
-          
-          {orderedItems.map((item, index) => {
-            const isCompleted = itemProgress?.find(ip => ip.itemId === item.trainingPathItem.id)?.isCompleted;
-            const isLesson = item.trainingPathItem.type === "Lesson";
-            const backgroundColor = isCompleted ? '#f0f0f0' : 'white';
-            const borderColor = isCompleted ? '#663366' : '#e0e0e0';
-
-            const handleItemClick = () => {
-              setHasStarted(true);
-              setCurrentIndex(index);
-            };
-
-            return (
-              <Box
-                key={item.trainingPathItem.id}
-                sx={{
-                  mb: 2,
-                  '&:last-child': { mb: 0 },
-                  cursor: 'pointer'
-                }}
-                onClick={handleItemClick}
-              >
-                <Card
-                  sx={{
-                    backgroundColor,
-                    border: `1px solid ${borderColor}`,
-                    borderRadius: '12px',
-                    mb: 1,
-                    '&:hover': {
-                      transform: 'scale(1.01)',
-                      transition: 'all 0.2s ease-in-out',
-                      boxShadow: 2,
-                      backgroundColor: isCompleted ? '#e8e8e8' : '#f5f5f5'
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ flex: 1, mr: 2 }}>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{
-                            color: '#663366',
-                            fontWeight: 'medium',
-                            mb: 0.5
-                          }}
-                        >
-                          {isLesson ? 'Leiding geven: ' : 'Quiz: '}{item.details.name || item.details.quizName}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: 'text.secondary',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical'
-                          }}
-                        >
-                          {item.details.text || item.details.quizDescription}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {isCompleted ? (
-                          <CheckCircleIcon sx={{ fontSize: 24, color: '#663366' }} />
-                        ) : (
-                          <RadioButtonUncheckedIcon sx={{ fontSize: 24, color: '#663366' }} />
-                        )}
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Box>
-            );
-          })}
+          {orderedItems.map((item, index) => (
+            <Box 
+              key={item.trainingPathItem.id}
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 1,
+                p: 2,
+                border: '1px solid #e0e0e0',
+                borderRadius: 1
+              }}
+            >
+              <Typography sx={{ flex: 1 }}>
+                {index + 1}. {item.details.name || item.details.quizName}
+                {' '}
+                <Typography component="span" color="textSecondary">
+                  ({item.trainingPathItem.type})
+                </Typography>
+              </Typography>
+              {itemProgress?.find(ip => ip.itemId === item.trainingPathItem.id)?.isCompleted && (
+                <CheckCircleIcon color="success" sx={{ ml: 1 }} />
+              )}
+            </Box>
+          ))}
         </Box>
 
         {/* Progress Section */}
@@ -340,14 +260,14 @@ const ModuleDetailsPage = () => {
               <Box sx={{ 
                 width: '100%', 
                 height: 10, 
-                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                bgcolor: '#e0e0e0',
                 borderRadius: 5,
                 position: 'relative'
               }}>
                 <Box sx={{
                   width: `${progress.percentageComplete || 0}%`,
                   height: '100%',
-                  bgcolor: '#FFD700',
+                  bgcolor: 'primary.main',
                   borderRadius: 5,
                   transition: 'width 0.5s ease-in-out'
                 }} />
@@ -383,12 +303,6 @@ const ModuleDetailsPage = () => {
             size="large"
             onClick={() => setHasStarted(true)}
             startIcon={<PlayArrowIcon />}
-            sx={{
-              backgroundColor: '#663366',
-              '&:hover': {
-                backgroundColor: '#4a2649'
-              }
-            }}
           >
             {progress?.status === "In Progress" ? "Continue Module" : "Start Module"}
           </Button>
@@ -422,55 +336,13 @@ const ModuleDetailsPage = () => {
       <Box sx={{ mb: 4 }}>
         {isLesson ? (
           <Box>
-            <Typography variant="h5" gutterBottom>
-              {details.name}
+            <Typography variant="h5">
+              Lesson: {details.name}
               {itemProgress?.find(ip => ip.itemId === currentItem.trainingPathItem.id)?.isCompleted && (
                 <CheckCircleIcon color="success" sx={{ ml: 1 }} />
               )}
             </Typography>
-            
-            {/* Description */}
-            {details.text && (
-              <Typography 
-                variant="body1" 
-                sx={{ 
-                  mb: 3,
-                  color: 'text.secondary',
-                  fontStyle: 'italic'
-                }}
-              >
-                {details.text}
-              </Typography>
-            )}
-
-            {/* Main Content */}
-            <Paper 
-              elevation={1} 
-              sx={{ 
-                p: 3, 
-                mb: 3,
-                backgroundColor: '#fff',
-                '& img': { maxWidth: '100%', height: 'auto' }
-              }}
-            >
-              <div dangerouslySetInnerHTML={{ __html: marked(details.markdownContent || '') }}></div>
-              {details.image && (
-                <Box sx={{ mt: 2 }}>
-                  <img src={details.image} alt={details.name} style={{ maxWidth: '100%' }} />
-                </Box>
-              )}
-              {details.video && (
-                <Box sx={{ mt: 2 }}>
-                  <iframe
-                    src={details.video}
-                    title="Lesson Video"
-                    style={{ width: '100%', height: '400px' }}
-                    frameBorder="0"
-                    allowFullScreen
-                  />
-                </Box>
-              )}
-            </Paper>
+            <Typography variant="body1">{details.text}</Typography>
           </Box>
         ) : (
           <Box>

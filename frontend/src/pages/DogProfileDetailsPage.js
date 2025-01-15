@@ -30,10 +30,15 @@ import PetsIcon from "@mui/icons-material/Pets";
 import axiosInstance from "../axios";
 import { isAdmin } from "../utils/auth";
 import Layout from "../components/Layout";
+import DataSensorIcon from '@mui/icons-material/DataUsage';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+console.log('Loading DogProfileDetailsPage file');
+
 const DogProfileDetailsPage = () => {
+  console.log('Starting DogProfileDetailsPage component');
+  
   const { id } = useParams();
   const navigate = useNavigate();
   const [dogProfile, setDogProfile] = useState(null);
@@ -51,32 +56,53 @@ const DogProfileDetailsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState(null);
 
+  console.log('Initial setup complete');
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Starting data fetch');
         const adminCheck = isAdmin();
+        console.log('Admin check result:', adminCheck);
         setIsUserAdmin(adminCheck);
         
         const profileResponse = await axiosInstance.get(`/api/DogProfile/${id}`);
+        console.log('Dog profile data:', profileResponse.data);
         setDogProfile(profileResponse.data);
         
         const notesResponse = await axiosInstance.get(`/api/Note/dogprofile/${id}`);
+        console.log('Notes data:', notesResponse.data);
         setNotes(notesResponse.data);
         
         const favoriteResponse = await axiosInstance.get(`/api/DogProfile/${id}/favorite/${userId}`);
+        console.log('Favorite status:', favoriteResponse.data);
         setIsFavorite(favoriteResponse.data.isFavorite);
 
         if (adminCheck) {
+          console.log('Fetching sensor data for dog:', id);
           const sensorResponse = await axiosInstance.get(`/api/DogSensorData/dog/${id}`);
+          console.log('Received sensor data:', sensorResponse.data);
           setSensorData(Array.isArray(sensorResponse.data) ? sensorResponse.data : []);
         }
       } catch (error) {
+        console.error('Error fetching data:', error);
         setError(error.message);
       }
     };
 
     fetchData();
   }, [id, userId]);
+
+  // Log state changes
+  useEffect(() => {
+    console.log('State updated:', {
+      isUserAdmin,
+      sensorDataCount: sensorData.length,
+      hasProfile: !!dogProfile,
+      notesCount: notes.length,
+      isFavorite
+    });
+  }, [isUserAdmin, sensorData, dogProfile, notes, isFavorite]);
 
   if (error) {
     return <Typography color="error">Error: {error}</Typography>;
@@ -176,121 +202,267 @@ const DogProfileDetailsPage = () => {
     );
 
   const uniqueSensorTypes = ["all", ...new Set(sensorData.map(data => data.sensorType))];
+
+  console.log('Before render, state:', { isUserAdmin, sensorData });
   
   return (
     <Layout>
       <Container maxWidth="md">
-        <Box sx={{ mt: 4, mb: 6 }}>
-          {/* Profile Header */}
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h4" gutterBottom>
-              {dogProfile?.name}
-            </Typography>
-            {dogProfile?.description && (
-              <Typography 
-                variant="body1" 
-                sx={{ 
-                  mb: 3,
-                  color: 'text.secondary',
-                  fontStyle: 'italic'
-                }}
-              >
-                {dogProfile.description}
-              </Typography>
-            )}
-          </Box>
-
-          {/* Main Content */}
-          <Paper 
-            elevation={1} 
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Typography variant="h4">
+            {dogProfile.name}
+          </Typography>
+          <IconButton 
+            onClick={handleToggleFavorite}
             sx={{ 
-              p: 4, 
-              mb: 4,
-              backgroundColor: '#fff',
+              color: isFavorite ? 'primary.main' : 'grey.400',
+              transform: isFavorite ? 'scale(1.1)' : 'scale(1)',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.2)',
+              }
             }}
           >
-            {/* Dog Details */}
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="h5" gutterBottom>Details</Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Ras:</strong> {dogProfile?.breed || "Onbekend"}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Leeftijd:</strong> {dogProfile?.age || "Onbekend"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Geslacht:</strong> {dogProfile?.gender || "Onbekend"}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Gewicht:</strong> {dogProfile?.weight ? `${dogProfile.weight} kg` : "Onbekend"}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
+            <PetsIcon />
+          </IconButton>
+        </Box>
+        <Box
+          sx={{
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            padding: "16px",
+            backgroundColor: "#f9f9f9",
+          }}
+        >
+          <Typography variant="body1">
+            <strong>Ras:</strong> {dogProfile.breed || "Niet gespecificeerd"}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Geboortedatum:</strong> {new Date(dogProfile.dateOfBirth).toLocaleDateString()}
+          </Typography>
+          {dogProfile.image && (
+            <img
+              src={dogProfile.image}
+              alt={dogProfile.name}
+              style={{ maxWidth: "100%", marginTop: "16px" }}
+            />
+          )}
+        </Box>
 
-            {/* Notes Section */}
-            {notes && notes.length > 0 && (
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h5" gutterBottom>Notities</Typography>
-                {notes.map((note) => (
-                  <Box key={note.id} sx={{ mb: 2 }}>
-                    <Typography variant="body1">{note.text}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(note.creationDate).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
-
-            {/* Sensor Data Section (Admin Only) */}
-            {isUserAdmin && sensorData && sensorData.length > 0 && (
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h5" gutterBottom>Sensor Data</Typography>
-                {uniqueSensorTypes.map(type => (
-                  <Box key={type} sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom>{type}</Typography>
-                    {filteredSensorData
-                      .filter(data => data.sensorType === type)
-                      .map(data => (
-                        <Box key={data.id} sx={{ mb: 2 }}>
-                          <Typography variant="body1">
-                            {data.name}: {data.averageValue} {data.unit}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(data.creationDate).toLocaleDateString()}
-                          </Typography>
-                        </Box>
-                      ))}
-                  </Box>
-                ))}
-              </Box>
-            )}
-          </Paper>
-
-          {/* Action Buttons */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+        {isUserAdmin && (
+          <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
             <Button
-              variant="outlined"
-              onClick={() => navigate("/dogprofiles")}
+              variant="contained"
+              color="primary"
+              onClick={() => navigate(`/dogprofile-editor?id=${id}`)}
             >
-              Terug naar Overzicht
+              Bewerken
             </Button>
-            {isUserAdmin && (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              Verwijderen
+            </Button>
+          </Box>
+        )}
+
+        <Typography variant="h5" sx={{ marginTop: 4 }}>
+          Notities
+        </Typography>
+        <Button variant="contained" color="primary" onClick={() => openEditDialog({})} sx={{ marginBottom: 2 }}>
+          Notitie Toevoegen
+        </Button>
+        <Grid container spacing={2}>
+          {notes.map((note) => (
+            <Grid item xs={12} sm={6} md={4} key={note.noteId}>
+              <Card>
+                <CardContent>
+                  <Typography variant="subtitle1">
+                    {note.userName || "Onbekend"}
+                  </Typography>
+                  <Typography variant="body2">{note.description}</Typography>
+                    {note.tag && (
+                  <Typography variant="caption" sx={{ color: "gray", display: "block", marginBottom: 1 }}>
+                    Tag: {note.tag}
+                  </Typography>
+            )}
+            {(isUserAdmin || note.userId === localStorage.getItem("userId")) && (
+              <Button
+                variant="text"
+                color="error"
+                onClick={() => openDeleteDialog(note)}
+              >
+                Verwijderen
+              </Button>
+              )}
+            </CardContent>
+          </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Sensor Data Section */}
+        {console.log('About to render sensor section, isUserAdmin:', isUserAdmin)}
+        {isUserAdmin ? (
+          <Box sx={{ mt: 4 }}>
+            {console.log('Inside sensor data section')}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5">
+                Sensor Data ({sensorData.length})
+              </Typography>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate(`/dogprofile-editor/${id}`)}
+                startIcon={<AddIcon />}
+                onClick={() => navigate('/sensor-data-form')}
               >
-                Bewerken
+                Sensordata Toevoegen
               </Button>
+            </Box>
+            
+            {/* Filters */}
+            <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel>Filter op Type</InputLabel>
+                <Select
+                  value={sensorTypeFilter}
+                  onChange={(e) => setSensorTypeFilter(e.target.value)}
+                  label="Filter op Type"
+                >
+                  {uniqueSensorTypes.map(type => (
+                    <MenuItem key={type} value={type}>
+                      {type === "all" ? "Alle Types" : type}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              
+              <TextField
+                label="Zoeken"
+                variant="outlined"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{ flexGrow: 1 }}
+              />
+            </Box>
+
+            {/* Sensor Data Table */}
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Naam</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell>Beschrijving</TableCell>
+                    <TableCell>Waarde</TableCell>
+                    <TableCell>Eenheid</TableCell>
+                    <TableCell>Datum</TableCell>
+                    <TableCell>Acties</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredSensorData.map((data) => (
+                    <TableRow key={data.dogSensorDataId}>
+                      <TableCell>{data.name}</TableCell>
+                      <TableCell>{data.sensorType}</TableCell>
+                      <TableCell>{data.description}</TableCell>
+                      <TableCell>{data.averageValue}</TableCell>
+                      <TableCell>{data.unit}</TableCell>
+                      <TableCell>
+                        {new Date(data.creationDate).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDeleteSensorData(data.dogSensorDataId)}
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            {filteredSensorData.length === 0 && (
+              <Typography sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
+                Geen sensor data gevonden
+              </Typography>
             )}
           </Box>
-        </Box>
+        ) : console.log('User is not admin, skipping sensor section')}
+
+        {/* Popup for Adding/Editing Note - editing wip */}
+        <Dialog open={addNoteDialogOpen} onClose={() => setAddNoteDialogOpen(false)}>
+          <DialogTitle>
+            {selectedNote?.noteId ? "Notitie Bewerken" : "Nieuwe Notitie Toevoegen"} 
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Beschrijving"
+              fullWidth
+              multiline
+              rows={4}
+              value={selectedNote?.description || ""}
+              onChange={(e) =>
+                setSelectedNote({ ...selectedNote, description: e.target.value })
+              }
+              sx={{ marginBottom: 2 }}
+            />
+            <TextField
+              label="Tag"
+              fullWidth
+              value={selectedNote?.tag || ""}
+              onChange={(e) => setSelectedNote({ ...selectedNote, tag: e.target.value })}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setAddNoteDialogOpen(false)} color="secondary">
+              Annuleren
+            </Button>
+            <Button onClick={handleAddOrEditNote} color="primary">
+              {selectedNote?.noteId ? "Bewerken" : "Toevoegen"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Popup for Deleting Note */}
+        <Dialog open={noteDeleteDialogOpen} onClose={() => setNoteDeleteDialogOpen(false)}>
+          <DialogTitle>Notitie Verwijderen</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Weet je zeker dat je deze notitie wilt verwijderen?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setNoteDeleteDialogOpen(false)} color="secondary">
+              Annuleren
+            </Button>
+            <Button onClick={handleDeleteNote} color="error">
+              Verwijderen
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Confirmatie dialoog voor verwijderen hondenprofiel */}
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+          <DialogTitle>Hond Verwijderen</DialogTitle>
+          <DialogContent>
+            <Typography>Weet je zeker dat je dit hondenprofiel wilt verwijderen?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+              Annuleren
+            </Button>
+            <Button onClick={handleDeleteDogProfile} color="error">
+              Verwijderen
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </Layout>
   );
