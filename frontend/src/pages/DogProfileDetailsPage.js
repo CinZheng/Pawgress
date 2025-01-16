@@ -270,40 +270,72 @@ const DogProfileDetailsPage = () => {
           </Box>
         )}
 
-        <Typography variant="h5" sx={{ marginTop: 4 }}>
-          Notities
-        </Typography>
-        <Button variant="contained" color="primary" onClick={() => openEditDialog({})} sx={{ marginBottom: 2 }}>
-          Notitie Toevoegen
-        </Button>
-        <Grid container spacing={2}>
-          {notes.map((note) => (
-            <Grid item xs={12} sm={6} md={4} key={note.noteId}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle1">
-                    {note.userName || "Onbekend"}
-                  </Typography>
-                  <Typography variant="body2">{note.description}</Typography>
-                    {note.tag && (
-                  <Typography variant="caption" sx={{ color: "gray", display: "block", marginBottom: 1 }}>
-                    Tag: {note.tag}
-                  </Typography>
-            )}
-            {(isUserAdmin || note.userId === localStorage.getItem("userId")) && (
-              <Button
-                variant="text"
-                color="error"
-                onClick={() => openDeleteDialog(note)}
-              >
-                Verwijderen
-              </Button>
-              )}
-            </CardContent>
-          </Card>
-            </Grid>
+        {/* Notes Section */}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Notities
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setSelectedNote({});
+              setAddNoteDialogOpen(true);
+            }}
+            sx={{ mb: 2 }}
+          >
+            Notitie Toevoegen
+          </Button>
+          {notes
+            .sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate))
+            .map((note) => (
+            <Box
+              key={note.noteId}
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "4px",
+                p: 2,
+                mb: 2,
+                backgroundColor: "#f9f9f9",
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Door: {note.userName}
+                </Typography>
+                <Box>
+                  {note.userId === userId && (
+                    <Button
+                      size="small"
+                      onClick={() => openEditDialog(note)}
+                      sx={{ mr: 1 }}
+                    >
+                      Bewerken
+                    </Button>
+                  )}
+                  {(note.userId === userId || isUserAdmin) && (
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => openDeleteDialog(note)}
+                    >
+                      Verwijderen
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+              <Typography variant="body1">{note.description}</Typography>
+              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+                <Typography variant="caption" color="textSecondary">
+                  Tag: {note.tag || "Geen tag"}
+                </Typography>
+                <Typography variant="caption" color="textSecondary">
+                  Gemaakt op: {new Date(note.creationDate).toLocaleDateString()}
+                </Typography>
+              </Box>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {/* Sensor Data Section */}
         {console.log('About to render sensor section, isUserAdmin:', isUserAdmin)}
@@ -401,7 +433,7 @@ const DogProfileDetailsPage = () => {
         {/* Popup for Adding/Editing Note - editing wip */}
         <Dialog open={addNoteDialogOpen} onClose={() => setAddNoteDialogOpen(false)}>
           <DialogTitle>
-            {selectedNote?.noteId ? "Notitie Bewerken" : "Nieuwe Notitie Toevoegen"} 
+            {selectedNote?.noteId ? "Notitie Bewerken" : "Nieuwe Notitie Toevoegen"}
           </DialogTitle>
           <DialogContent>
             <TextField
@@ -413,7 +445,7 @@ const DogProfileDetailsPage = () => {
               onChange={(e) =>
                 setSelectedNote({ ...selectedNote, description: e.target.value })
               }
-              sx={{ marginBottom: 2 }}
+              sx={{ marginBottom: 2, marginTop: 2 }}
             />
             <TextField
               label="Tag"
