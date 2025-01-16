@@ -196,7 +196,7 @@ const ModuleEditorPage = () => {
     setError("");
 
     if (!formData.name.trim()) {
-      setError("Name is required.");
+      setError("Naam is verplicht.");
       return;
     }
 
@@ -212,17 +212,28 @@ const ModuleEditorPage = () => {
       };
 
       if (moduleId) {
-        await axiosInstance.put(`/api/TrainingPath/${moduleId}`, payload);
-        setMessage("Module successfully updated!");
+        const response = await axiosInstance.put(`/api/TrainingPath/${moduleId}`, payload);
+        setMessage("Module succesvol bijgewerkt!");
+        // Only navigate if there was no error
+        navigate("/modules");
       } else {
-        await axiosInstance.post("/api/TrainingPath", payload);
-        setMessage("Module successfully created!");
+        const response = await axiosInstance.post("/api/TrainingPath", payload);
+        setMessage("Module succesvol aangemaakt!");
+        // Only navigate if there was no error
+        navigate("/modules");
       }
-
-      navigate("/modules");
     } catch (err) {
       console.error("Error saving module:", err);
-      setError("An error occurred while saving the module.");
+      // Extract error message from response if available
+      const errorMessage = err.response?.data?.error || 
+                          err.response?.data?.message || 
+                          err.response?.data || 
+                          err.message || 
+                          "Er is een fout opgetreden bij het opslaan van de module.";
+      setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+      
+      // Don't navigate if there was an error
+      return;
     }
   };
 

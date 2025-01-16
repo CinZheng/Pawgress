@@ -43,41 +43,55 @@ namespace Pawgress.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] TrainingPathDto trainingPathDto)
         {
-            var trainingPath = new TrainingPath
+            try
             {
-                TrainingPathId = Guid.NewGuid(),
-                Name = trainingPathDto.Name,
-                Description = trainingPathDto.Description,
-                TrainingPathItems = trainingPathDto.LessonsQuizzes.Select((item, index) => new TrainingPathItemOrder
+                var trainingPath = new TrainingPath
                 {
-                    TrainingPathItemId = item.Id,
-                    Order = index + 1
-                }).ToList(),
-                CreationDate = DateTime.Now,
-                UpdateDate = DateTime.Now
-            };
+                    TrainingPathId = Guid.NewGuid(),
+                    Name = trainingPathDto.Name,
+                    Description = trainingPathDto.Description,
+                    TrainingPathItems = trainingPathDto.LessonsQuizzes.Select((item, index) => new TrainingPathItemOrder
+                    {
+                        TrainingPathItemId = item.Id,
+                        Order = index + 1
+                    }).ToList(),
+                    CreationDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
+                };
 
-            var created = _service.Create(trainingPath);
-            return Ok(ToTrainingPathDto(created));
+                var created = _service.Create(trainingPath);
+                return Ok(ToTrainingPathDto(created));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(Guid id, [FromBody] TrainingPathDto trainingPathDto)
         {
-            var trainingPath = _service.GetById(id);
-            if (trainingPath == null) return NotFound("Niet gevonden.");
-
-            trainingPath.Name = trainingPathDto.Name;
-            trainingPath.Description = trainingPathDto.Description;
-            trainingPath.TrainingPathItems = trainingPathDto.LessonsQuizzes.Select((item, index) => new TrainingPathItemOrder
+            try
             {
-                TrainingPathItemId = item.Id,
-                Order = index + 1
-            }).ToList();
-            trainingPath.UpdateDate = DateTime.Now;
+                var trainingPath = _service.GetById(id);
+                if (trainingPath == null) return NotFound("Module niet gevonden.");
 
-            _service.Update(id, trainingPath);
-            return Ok(ToTrainingPathDto(trainingPath));
+                trainingPath.Name = trainingPathDto.Name;
+                trainingPath.Description = trainingPathDto.Description;
+                trainingPath.TrainingPathItems = trainingPathDto.LessonsQuizzes.Select((item, index) => new TrainingPathItemOrder
+                {
+                    TrainingPathItemId = item.Id,
+                    Order = index + 1
+                }).ToList();
+                trainingPath.UpdateDate = DateTime.Now;
+
+                var updated = _service.Update(id, trainingPath);
+                return Ok(ToTrainingPathDto(updated));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]

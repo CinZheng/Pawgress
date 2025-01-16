@@ -85,13 +85,28 @@ const ModuleOverviewPage = () => {
             <Grid item xs={12} sm={6} md={4} key={module.trainingPathId}>
               <Card
                 onClick={() => navigate(`/modules/${module.trainingPathId}`)}
-                style={{ cursor: "pointer" }}
+                sx={{
+                  cursor: "pointer",
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                    transition: 'transform 0.2s'
+                  }
+                }}
               >
-                <CardContent>
-                  <Typography variant="h6">{module.name}</Typography>
-                  <Typography variant="body2">{module.description}</Typography>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      {module.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                      {module.description}
+                    </Typography>
+                  </Box>
                   {!isUserAdmin && progression[module.trainingPathId] && (
-                    <Box sx={{ mt: 2 }}>
+                    <Box sx={{ mt: 'auto' }}>
                       <Box sx={{ 
                         width: '100%', 
                         height: 4, 

@@ -33,47 +33,81 @@ namespace Pawgress.Services
 
         public TrainingPath Create(TrainingPath path)
         {
-            path.TrainingPathId = Guid.NewGuid();
-            path.CreationDate = DateTime.Now;
-            path.UpdateDate = DateTime.Now;
-
-            if (path.TrainingPathItems != null)
+            try
             {
-                foreach (var item in path.TrainingPathItems)
-                {
-                    item.Id = Guid.NewGuid(); // Ensure IDs are generated for the relationship entries
-                }
-            }
+                path.UpdateDate = DateTime.Now;
+                path.CreationDate = DateTime.Now;
 
-            _context.TrainingPaths.Add(path);
-            _context.SaveChanges();
-            return path;
+                // Store the TrainingPathItems temporarily
+                var items = path.TrainingPathItems?.ToList();
+                path.TrainingPathItems = null;
+
+                // First add the TrainingPath
+                _context.TrainingPaths.Add(path);
+                _context.SaveChanges();
+
+                // Then add the TrainingPathItems if any
+                if (items != null && items.Any())
+                {
+                    foreach (var item in items)
+                    {
+                        item.TrainingPathId = path.TrainingPathId;
+                    }
+                    _context.TrainingPathItemOrders.AddRange(items);
+                    _context.SaveChanges();
+                }
+
+                // Reload the path with its items before returning
+                return _context.TrainingPaths
+                    .Include(tp => tp.TrainingPathItems)
+                        .ThenInclude(tpi => tpi.TrainingPathItem)
+                    .Include(tp => tp.Users)
+                    .FirstOrDefault(tp => tp.TrainingPathId == path.TrainingPathId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating training path: {ex.Message}");
+            }
         }
 
         public TrainingPath? Update(Guid id, TrainingPath updatedPath)
         {
-            var path = GetById(id);
-            if (path == null) return null;
-
-            path.Name = updatedPath.Name;
-            path.Description = updatedPath.Description;
-            path.UpdateDate = DateTime.Now;
-
-            // Clear existing TrainingPathItems and re-add them to maintain the order
-            _context.TrainingPathItemOrders.RemoveRange(
-                _context.TrainingPathItemOrders.Where(tpi => tpi.TrainingPathId == id));
-
-            if (updatedPath.TrainingPathItems != null)
+            try
             {
-                foreach (var item in updatedPath.TrainingPathItems)
-                {
-                    item.Id = Guid.NewGuid(); // Ensure IDs are set for the relationship entries
-                    _context.TrainingPathItemOrders.Add(item);
-                }
-            }
+                var path = GetById(id);
+                if (path == null) return null;
 
-            _context.SaveChanges();
-            return path;
+                path.Name = updatedPath.Name;
+                path.Description = updatedPath.Description;
+                path.UpdateDate = DateTime.Now;
+
+                // Remove existing items
+                var existingItems = _context.TrainingPathItemOrders.Where(tpi => tpi.TrainingPathId == id);
+                _context.TrainingPathItemOrders.RemoveRange(existingItems);
+
+                // Add new items
+                if (updatedPath.TrainingPathItems != null)
+                {
+                    foreach (var item in updatedPath.TrainingPathItems)
+                    {
+                        item.TrainingPathId = id;
+                        _context.TrainingPathItemOrders.Add(item);
+                    }
+                }
+
+                _context.SaveChanges();
+
+                // Reload the path with its items before returning
+                return _context.TrainingPaths
+                    .Include(tp => tp.TrainingPathItems)
+                        .ThenInclude(tpi => tpi.TrainingPathItem)
+                    .Include(tp => tp.Users)
+                    .FirstOrDefault(tp => tp.TrainingPathId == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating training path: {ex.Message}");
+            }
         }
 
         public bool Delete(Guid id)
