@@ -114,9 +114,14 @@ namespace Pawgress.Controllers
         {
             var existingNote = _service.GetById(id);
             if (existingNote == null) return NotFound("Notitie niet gevonden.");
+            
+            // Update only the editable fields
             existingNote.Description = noteDto.Description;
             existingNote.Tag = noteDto.Tag;
-            existingNote.CreationDate = noteDto.CreationDate;
+            
+            // Keep the original creation date and update the update date
+            existingNote.UpdateDate = DateTime.Now;
+            // Do not modify CreationDate as it should remain the original creation date
 
             var updatedNote = _service.Update(id, existingNote);
             return Ok(new NoteDto
@@ -125,7 +130,8 @@ namespace Pawgress.Controllers
                 DogProfileId = updatedNote.DogProfileId,
                 UserId = updatedNote.UserId,
                 Tag = updatedNote.Tag,
-                UpdateDate = DateTime.Now,
+                CreationDate = updatedNote.CreationDate, // Return the original creation date
+                UpdateDate = updatedNote.UpdateDate,
                 Description = updatedNote.Description,
                 UserName = updatedNote.User?.Username ?? "Onbekend"
             });
