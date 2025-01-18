@@ -69,17 +69,25 @@ const DogProfileEditorPage = () => {
     }
 
     try {
+      const dataToSend = {
+        ...formData,
+        dateOfBirth: formData.dateOfBirth || new Date().toISOString().split('T')[0],
+        creationDate: new Date().toISOString(),
+        updateDate: new Date().toISOString()
+      };
+
       if (dogId) {
-        await axiosInstance.put(`/api/DogProfile/${dogId}`, formData);
+        await axiosInstance.put(`/api/DogProfile/${dogId}`, dataToSend);
         setMessage("Hondenprofiel succesvol bijgewerkt!");
       } else {
-        await axiosInstance.post("/api/DogProfile", formData);
+        await axiosInstance.post("/api/DogProfile", dataToSend);
         setMessage("Hondenprofiel succesvol aangemaakt!");
         navigate("/dogprofiles");
       }
     } catch (error) {
       console.error("Fout bij opslaan van hondenprofiel:", error);
-      setError("Er is een fout opgetreden bij het opslaan van het hondenprofiel.");
+      const errorMessage = error.response?.data?.message || error.response?.data || "Er is een fout opgetreden bij het opslaan van het hondenprofiel.";
+      setError(errorMessage);
     }
   };
 

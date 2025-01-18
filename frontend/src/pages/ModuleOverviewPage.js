@@ -30,7 +30,10 @@ const ModuleOverviewPage = () => {
                   completedItems: progressResponse.data.completedItems,
                   totalItems: progressResponse.data.totalItems,
                   percentageComplete: progressResponse.data.percentageComplete,
-                  status: progressResponse.data.status
+                  status: progressResponse.data.status === 'Not Started' ? 'Niet Gestart' :
+                         progressResponse.data.status === 'In Progress' ? 'In Uitvoering' :
+                         progressResponse.data.status === 'Completed' ? 'Voltooid' :
+                         progressResponse.data.status
                 }
               };
             } catch (error) {
@@ -40,7 +43,7 @@ const ModuleOverviewPage = () => {
                   completedItems: 0,
                   totalItems: 0,
                   percentageComplete: 0,
-                  status: 'Not Started'
+                  status: 'Niet Gestart'
                 }
               };
             }
@@ -123,7 +126,7 @@ const ModuleOverviewPage = () => {
                         }} />
                       </Box>
                       <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
-                        {`${progression[module.trainingPathId].completedItems} of ${progression[module.trainingPathId].totalItems} completed (${Math.round(progression[module.trainingPathId].percentageComplete)}%)`}
+                        {`${progression[module.trainingPathId].completedItems} van ${progression[module.trainingPathId].totalItems} voltooid (${Math.round(progression[module.trainingPathId].percentageComplete)}%)`}
                       </Typography>
                       <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>
                         Status: {progression[module.trainingPathId].status}

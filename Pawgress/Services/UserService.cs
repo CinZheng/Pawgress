@@ -1,25 +1,25 @@
-using Pawgress.Data;
+using Pawgress.Repositories;
 using Pawgress.Models;
 
 namespace Pawgress.Services
 {
     public class UserService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(ApplicationDbContext context)
+        public UserService(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
 
         public List<User> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return _userRepository.GetAll();
         }
 
         public User? GetUserById(Guid id)
         {
-            return _context.Users.FirstOrDefault(u => u.UserId == id);
+            return _userRepository.GetById(id);
         }
 
         public User CreateUser(User newUser)
@@ -27,33 +27,17 @@ namespace Pawgress.Services
             newUser.UserId = Guid.NewGuid();
             newUser.CreationDate = DateTime.Now;
             newUser.UpdateDate = DateTime.Now;
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
-            return newUser;
+            return _userRepository.Create(newUser);
         }
 
         public User? UpdateUser(Guid id, User updatedUser)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == id);
-            if (user == null) return null;
-
-            user.Username = updatedUser.Username ?? user.Username;
-            user.Email = updatedUser.Email ?? user.Email;
-            user.ProgressData = updatedUser.ProgressData ?? user.ProgressData;
-            user.UpdateDate = DateTime.Now;
-
-            _context.SaveChanges();
-            return user;
+            return _userRepository.Update(id, updatedUser);
         }
 
         public bool DeleteUser(Guid id)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == id);
-            if (user == null) return false;
-
-            _context.Users.Remove(user);
-            _context.SaveChanges();
-            return true;
+            return _userRepository.Delete(id);
         }
     }
 }

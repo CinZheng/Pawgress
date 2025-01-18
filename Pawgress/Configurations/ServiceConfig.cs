@@ -1,5 +1,6 @@
 using Pawgress.Models;
 using Pawgress.Services;
+using Pawgress.Repositories;
 
 namespace Pawgress.Extensions
 {
@@ -14,6 +15,13 @@ namespace Pawgress.Extensions
             services.AddScoped<BaseService<Quiz>>();
             services.AddScoped<BaseService<Note>>();
 
+            // repository registrations
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IDogProfileRepository, DogProfileRepository>();
+            services.AddScoped<ILessonRepository, LessonRepository>();
+            services.AddScoped<IQuizRepository, QuizRepository>();
+            services.AddScoped<INoteRepository, NoteRepository>();
+
             // specific services
             services.AddScoped<UserService>();
             services.AddScoped<TrainingPathService>();
@@ -21,8 +29,8 @@ namespace Pawgress.Extensions
             services.AddScoped<FolderService>();
             services.AddScoped<QuizService>();
             services.AddScoped<LessonService>();
-            services.AddScoped<DogProfileService>(); 
-            services.AddScoped<DogSensorData>(); 
+            services.AddScoped<DogProfileService>();
+            services.AddScoped<DogSensorDataService>();
             return services;
         }
     }

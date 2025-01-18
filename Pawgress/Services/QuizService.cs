@@ -1,13 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using Pawgress.Data;
+using Pawgress.Repositories;
 using Pawgress.Models;
 
 namespace Pawgress.Services
 {
-    public class QuizService : BaseService<Quiz>
+    public class QuizService
     {
-        public QuizService(ApplicationDbContext context) : base(context)
+        private readonly IQuizRepository _quizRepository;
+
+        public QuizService(IQuizRepository quizRepository)
         {
+            _quizRepository = quizRepository;
         }
 
         public Quiz AddQuestion(Guid quizId, QuizQuestion question)
@@ -20,20 +22,32 @@ namespace Pawgress.Services
             return quiz;
         }
 
-        public override Quiz? GetById(Guid id)
+        public Quiz? GetById(Guid id)
         {
-            // Laadt ook de gerelateerde QuizQuestions
-            return _context.Quizzes
-                .Include(q => q.QuizQuestions)
-                .FirstOrDefault(q => q.Id == id);
+            return _quizRepository.GetById(id);
         }
 
-        public override List<Quiz> GetAll()
+        public List<Quiz> GetAll()
         {
-            // Laadt ook de gerelateerde QuizQuestions
-            return _context.Quizzes
-                .Include(q => q.QuizQuestions)
-                .ToList();
+            return _quizRepository.GetAll();
+        }
+
+        public Quiz Create(Quiz quiz)
+        {
+            quiz.Id = Guid.NewGuid();
+            quiz.CreationDate = DateTime.Now;
+            quiz.UpdateDate = DateTime.Now;
+            return _quizRepository.Create(quiz);
+        }
+
+        public Quiz? Update(Guid id, Quiz quiz)
+        {
+            return _quizRepository.Update(id, quiz);
+        }
+
+        public bool Delete(Guid id)
+        {
+            return _quizRepository.Delete(id);
         }
     }
 }

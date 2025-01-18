@@ -6,6 +6,7 @@ import { isAdmin } from "../utils/auth";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { marked } from "marked";
 
 const ModuleDetailsPage = () => {
   const { id } = useParams();
@@ -195,7 +196,7 @@ const ModuleDetailsPage = () => {
             onClick={() => setHasStarted(true)}
             startIcon={<PlayArrowIcon />}
           >
-            {progress?.status === "In Progress" ? "Continue Module" : "Start Module"}
+            {progress?.status === "Bezig" ? "Ga verder met module" : "Start Module"}
           </Button>
           {userIsAdmin && (
             <Button
@@ -216,12 +217,45 @@ const ModuleDetailsPage = () => {
       <Box sx={{ mb: 4 }}>
         {isLesson ? (
           <Box>
-            <Typography variant="h5">
+            <Typography variant="h5" gutterBottom>
               Lesson: {details.name}
               {itemProgress?.find((ip) => ip.itemId === currentItem.trainingPathItem.id)
                 ?.isCompleted && <CheckCircleIcon color="success" sx={{ ml: 1 }} />}
             </Typography>
-            <Typography variant="body1">{details.text}</Typography>
+            <Box 
+              sx={{ 
+                mt: 2, 
+                mb: 2, 
+                border: "1px solid #ccc", 
+                borderRadius: "4px", 
+                padding: "16px", 
+                backgroundColor: "#f9f9f9",
+                maxHeight: "calc(100vh - 300px)",
+                overflow: "auto"
+              }}
+            >
+              <div 
+                style={{ 
+                  wordWrap: "break-word",
+                  whiteSpace: "pre-wrap"
+                }}
+                dangerouslySetInnerHTML={{ __html: marked(details.markdownContent || "") }}
+              ></div>
+              {details.image && (
+                <Box sx={{ mt: 2 }}>
+                  <img src={details.image} alt="Lesson" style={{ maxWidth: "100%", height: "auto" }} />
+                </Box>
+              )}
+              {details.video && (
+                <Box sx={{ mt: 2 }}>
+                  <iframe
+                    src={details.video}
+                    title="Lesson Video"
+                    style={{ width: "100%", height: "300px" }}
+                  ></iframe>
+                </Box>
+              )}
+            </Box>
           </Box>
         ) : (
           <Box>
@@ -259,7 +293,7 @@ const ModuleDetailsPage = () => {
           startIcon={<ArrowBackIcon />}
           sx={{ width: { xs: "100%", sm: "auto" } }}
         >
-          Back to Overview
+          Terug naar overzicht
         </Button>
         <Button
           variant="contained"
@@ -268,7 +302,7 @@ const ModuleDetailsPage = () => {
           disabled={currentIndex === 0}
           sx={{ width: { xs: "100%", sm: "auto" } }}
         >
-          Previous
+          Terug
         </Button>
         {!userIsAdmin && (
           <Button
@@ -310,8 +344,8 @@ const ModuleDetailsPage = () => {
             {itemProgress?.find(
               (ip) => ip.itemId === currentItem.trainingPathItem.id
             )?.isCompleted
-              ? "Mark as Incomplete"
-              : "Mark as Complete"}
+              ? "Markeer als niet voltooid"
+              : "Markeer als voltooid"}
           </Button>
         )}
         <Button
@@ -320,7 +354,7 @@ const ModuleDetailsPage = () => {
           onClick={handleNext}
           sx={{ width: { xs: "100%", sm: "auto" } }}
         >
-          {currentIndex + 1 < orderedItems.length ? "Next" : "Back to Overview"}
+          {currentIndex + 1 < orderedItems.length ? "Volgende" : "Terug naar overzicht"}
         </Button>
       </Box>
     </Container>

@@ -1,35 +1,55 @@
-using Microsoft.EntityFrameworkCore;
-using Pawgress.Data;
+using Pawgress.Repositories;
 using Pawgress.Models;
 
 namespace Pawgress.Services
 {
-    public class NoteService : BaseService<Note>
+    public class NoteService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly INoteRepository _noteRepository;
+        private readonly IUserRepository _userRepository;
 
-        public NoteService(ApplicationDbContext context) : base(context)
+        public NoteService(INoteRepository noteRepository, IUserRepository userRepository)
         {
-            _context = context;
+            _noteRepository = noteRepository;
+            _userRepository = userRepository;
         }
 
         public User? GetUserById(Guid userId)
         {
-            return _context.Users.FirstOrDefault(u => u.UserId == userId);
+            return _userRepository.GetById(userId);
         }
 
-        public override Note? GetById(Guid id)
+        public Note? GetById(Guid id)
         {
-            return _context.Notes
-                .Include(n => n.User) // Eager loading van de User, namen van notities komen anders niet op
-                .FirstOrDefault(n => n.NoteId == id);
+            return _noteRepository.GetById(id);
         }
 
-        public override List<Note> GetAll()
+        public List<Note> GetAll()
         {
-            return _context.Notes
-                .Include(n => n.User) // Eager loading van de User
-                .ToList();
+            var notes = _noteRepository.GetAll();
+            foreach (var note in notes)
+            {
+                note.User = _userRepository.GetById(note.UserId);
+            }
+            return notes;
+        }
+
+        public Note Create(Note note)
+        {
+            note.NoteId = Guid.NewGuid();
+            note.CreationDate = DateTime.Now;
+            note.UpdateDate = DateTime.Now;
+            return _noteRepository.Create(note);
+        }
+
+        public Note? Update(Guid id, Note note)
+        {
+            return _noteRepository.Update(id, note);
+        }
+
+        public bool Delete(Guid id)
+        {
+            return _noteRepository.Delete(id);
         }
     }
 }

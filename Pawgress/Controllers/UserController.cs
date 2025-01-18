@@ -47,29 +47,22 @@ namespace Pawgress.Controllers
             }
         }
 
-        [HttpGet("{userId}/favorites")]
-        public async Task<IActionResult> GetFavoriteDogs(Guid userId)
+        [HttpGet("{id}/favorites")]
+        public async Task<IActionResult> GetFavoriteDogs(Guid id)
         {
             try
             {
                 var favoriteDogs = await _context.UserDogProfiles
-                    .Where(udp => udp.UserId == userId && udp.IsFavorite)
+                    .Where(udp => udp.UserId == id)
                     .Include(udp => udp.DogProfile)
-                    .Select(udp => new
-                    {
-                        udp.DogProfile.DogProfileId,
-                        udp.DogProfile.Name,
-                        udp.DogProfile.Breed,
-                        udp.DogProfile.Image,
-                        udp.DogProfile.DateOfBirth
-                    })
+                    .Select(udp => udp.DogProfile)
                     .ToListAsync();
 
                 return Ok(favoriteDogs);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, $"Er is een fout opgetreden bij het ophalen van favoriete honden: {ex.Message}");
             }
         }
 

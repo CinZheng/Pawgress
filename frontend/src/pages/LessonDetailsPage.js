@@ -56,14 +56,30 @@ const LessonDetailsPage = () => {
           backgroundColor: "#f9f9f9",
         }}
       >
-        <div dangerouslySetInnerHTML={{ __html: marked(lesson.markdownContent || "") }}></div>
-        {lesson.image && <img src={lesson.image} alt="Lesson" style={{ maxWidth: "100%", marginTop: "16px" }} />}
+        <div 
+          style={{ 
+            maxHeight: "500px", 
+            overflowY: "auto",
+            overflowX: "hidden",
+            padding: "8px",
+            wordWrap: "break-word",
+            whiteSpace: "pre-wrap"
+          }}
+          dangerouslySetInnerHTML={{ __html: marked(lesson.markdownContent || "") }}
+        ></div>
+        {lesson.image && (
+          <Box sx={{ mt: 2 }}>
+            <img src={lesson.image} alt="Lesson" style={{ maxWidth: "100%", marginTop: "16px" }} />
+          </Box>
+        )}
         {lesson.video && (
-          <iframe
-            src={lesson.video}
-            title="Lesson Video"
-            style={{ width: "100%", height: "300px", marginTop: "16px" }}
-          ></iframe>
+          <Box sx={{ mt: 2 }}>
+            <iframe
+              src={lesson.video}
+              title="Lesson Video"
+              style={{ width: "100%", height: "300px", marginTop: "16px" }}
+            ></iframe>
+          </Box>
         )}
         <Typography variant="body2" sx={{ marginTop: "8px" }}>
           Tags: {lesson.tag || "Geen tags"}
