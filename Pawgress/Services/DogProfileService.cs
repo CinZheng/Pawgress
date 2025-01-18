@@ -9,12 +9,12 @@ namespace Pawgress.Services
 
         public DogProfileService(IDogProfileRepository dogProfileRepository)
         {
-            _dogProfileRepository = dogProfileRepository;
+            _dogProfileRepository = dogProfileRepository ?? throw new ArgumentNullException(nameof(dogProfileRepository));
         }
 
         public List<DogProfile> GetAll()
         {
-            return _dogProfileRepository.GetAll();
+            return _dogProfileRepository.GetAll() ?? new List<DogProfile>();
         }
 
         public DogProfile? GetById(Guid id)
@@ -24,14 +24,23 @@ namespace Pawgress.Services
 
         public DogProfile Create(DogProfile dogProfile)
         {
+            if (dogProfile == null) throw new ArgumentNullException(nameof(dogProfile));
+
             dogProfile.DogProfileId = Guid.NewGuid();
-            dogProfile.CreationDate = DateTime.Now;
-            dogProfile.UpdateDate = DateTime.Now;
+            dogProfile.CreationDate = DateTime.UtcNow;
+            dogProfile.UpdateDate = DateTime.UtcNow;
             return _dogProfileRepository.Create(dogProfile);
         }
 
         public DogProfile? Update(Guid id, DogProfile dogProfile)
         {
+            if (dogProfile == null) throw new ArgumentNullException(nameof(dogProfile));
+
+            var existingProfile = GetById(id);
+            if (existingProfile == null) return null;
+
+            dogProfile.CreationDate = existingProfile.CreationDate;
+            dogProfile.UpdateDate = DateTime.UtcNow;
             return _dogProfileRepository.Update(id, dogProfile);
         }
 

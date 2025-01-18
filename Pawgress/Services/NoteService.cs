@@ -10,8 +10,8 @@ namespace Pawgress.Services
 
         public NoteService(INoteRepository noteRepository, IUserRepository userRepository)
         {
-            _noteRepository = noteRepository;
-            _userRepository = userRepository;
+            _noteRepository = noteRepository ?? throw new ArgumentNullException(nameof(noteRepository));
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public User? GetUserById(Guid userId)
@@ -26,7 +26,7 @@ namespace Pawgress.Services
 
         public List<Note> GetAll()
         {
-            var notes = _noteRepository.GetAll();
+            var notes = _noteRepository.GetAll() ?? new List<Note>();
             foreach (var note in notes)
             {
                 note.User = _userRepository.GetById(note.UserId);
@@ -36,14 +36,23 @@ namespace Pawgress.Services
 
         public Note Create(Note note)
         {
+            if (note == null) throw new ArgumentNullException(nameof(note));
+
             note.NoteId = Guid.NewGuid();
-            note.CreationDate = DateTime.Now;
-            note.UpdateDate = DateTime.Now;
+            note.CreationDate = DateTime.UtcNow;
+            note.UpdateDate = DateTime.UtcNow;
             return _noteRepository.Create(note);
         }
 
         public Note? Update(Guid id, Note note)
         {
+            if (note == null) throw new ArgumentNullException(nameof(note));
+
+            var existingNote = GetById(id);
+            if (existingNote == null) return null;
+
+            note.CreationDate = existingNote.CreationDate;
+            note.UpdateDate = DateTime.UtcNow;
             return _noteRepository.Update(id, note);
         }
 
