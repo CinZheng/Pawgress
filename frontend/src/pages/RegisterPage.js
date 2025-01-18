@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Container, Typography, TextField, Button, Box, Alert } from "@mui/material";
+import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axios";
 import Layout from "../components/Layout";
+import { useNotification } from "../context/NotificationContext";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({});
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,12 +18,10 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       await axiosInstance.post("/api/Auth/register", formData);
-      setMessage("Registratie succesvol! Je kunt nu inloggen.");
-      setError("");
+      showNotification("Registratie succesvol! Je kunt nu inloggen.", "success");
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      setError("Registratie mislukt. Probeer het opnieuw.");
-      setMessage("");
+      showNotification("Registratie mislukt. Probeer het opnieuw.", "error");
     }
   };
 
@@ -63,9 +61,6 @@ const RegisterPage = () => {
             Registreren
           </Button>
         </Box>
-
-        {message && <Alert severity="success" sx={{ marginTop: 2 }}>{message}</Alert>}
-        {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
         
         <Typography sx={{ marginTop: 2, textAlign: "center" }}>
           Al een account geregistreerd?{" "}

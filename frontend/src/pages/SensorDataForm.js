@@ -6,11 +6,11 @@ import {
   Button,
   Typography,
   CircularProgress,
-  Alert,
   Box,
 } from "@mui/material";
 import axiosInstance from "../axios";
 import Layout from "../components/Layout";
+import { useNotification } from "../context/NotificationContext";
 
 const SensorDataForm = () => {
   const [formData, setFormData] = useState({
@@ -24,10 +24,8 @@ const SensorDataForm = () => {
 
   const [dogProfiles, setDogProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const { showNotification } = useNotification();
 
-  // These must match the backend enum exactly
   const sensorTypes = [
     "Accelerometer",
     "Gyroscope",
@@ -45,14 +43,14 @@ const SensorDataForm = () => {
         setDogProfiles(response.data);
       } catch (err) {
         console.error("Fout bij ophalen DogProfiles:", err);
-        setError("Kan DogProfiles niet ophalen. Probeer het later opnieuw.");
+        showNotification("Kon DogProfiles niet ophalen. Probeer het later opnieuw.", "error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchDogProfiles();
-  }, []);
+  }, [showNotification]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,7 +61,7 @@ const SensorDataForm = () => {
     }
 
     if (name === 'dogProfileId') {
-      processedValue = value; // Keep as string, will be converted to GUID by backend
+      processedValue = value;
     }
 
     setFormData(prev => ({ ...prev, [name]: processedValue }));
@@ -71,11 +69,9 @@ const SensorDataForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     if (!formData.name || !formData.dogProfileId) {
-      setError("Naam en DogProfile zijn verplicht.");
+      showNotification("Naam en DogProfile zijn verplicht", "error");
       return;
     }
 
@@ -90,8 +86,8 @@ const SensorDataForm = () => {
       };
 
       await axiosInstance.post("/api/DogSensorData", dataToSend);
-      setSuccess("Sensor data succesvol toegevoegd!");
-      // Clear form
+      showNotification("Sensor data succesvol toegevoegd!", "success");
+      
       setFormData({
         name: "",
         description: "",
@@ -108,7 +104,7 @@ const SensorDataForm = () => {
                           err.response?.data || 
                           err.message || 
                           "Er is een fout opgetreden bij het opslaan van sensordata.";
-      setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+      showNotification(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage), "error");
     }
   };
 
@@ -128,8 +124,6 @@ const SensorDataForm = () => {
         <Typography variant="h4" gutterBottom>
           Sensor Data Toevoegen
         </Typography>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             name="name"

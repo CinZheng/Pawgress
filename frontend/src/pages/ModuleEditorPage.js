@@ -5,7 +5,6 @@ import {
   Button,
   Typography,
   Box,
-  Alert,
   MenuItem,
   Select,
   IconButton,
@@ -21,6 +20,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { isAdmin } from "../utils/auth";
 import Layout from "../components/Layout";
+import { useNotification } from "../context/NotificationContext";
 
 const ItemType = "ITEM";
 
@@ -70,6 +70,7 @@ const ModuleEditorPage = () => {
   const navigate = useNavigate();
   const [isUserAdmin] = useState(isAdmin());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -78,8 +79,6 @@ const ModuleEditorPage = () => {
   });
   const [quizzes, setQuizzes] = useState([]);
   const [lessons, setLessons] = useState([]);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,22 +86,19 @@ const ModuleEditorPage = () => {
         let orders = [];
         if (moduleId) {
           try {
-            // Attempt to fetch ordered items
             const ordersResponse = await axiosInstance.get(`/api/TrainingPathItemOrder/TrainingPath/${moduleId}`);
             orders = ordersResponse.data;
           } catch (err) {
             if (err.response?.status === 404) {
-              // Treat 404 as no items available
               console.warn("No items found for this training path.");
             } else {
-              throw err; // Re-throw for other errors
+              throw err;
             }
           }
   
           const moduleResponse = await axiosInstance.get(`/api/TrainingPath/${moduleId}`);
           const module = moduleResponse.data;
   
-          // Fetch details for lessons and quizzes in order
           const itemsDetails = await Promise.all(
             orders.map(async (order) => {
               const { id: itemId, type } = order.trainingPathItem;
@@ -122,7 +118,6 @@ const ModuleEditorPage = () => {
           });
         }
   
-        // Fetch available quizzes and lessons for the dropdown
         const [quizzesResponse, lessonsResponse] = await Promise.all([
           axiosInstance.get("/api/Quiz"),
           axiosInstance.get("/api/Lesson"),
@@ -134,13 +129,12 @@ const ModuleEditorPage = () => {
         setLessons(lessonsResponse.data.filter((l) => !selectedItemIds.has(l.id)));
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError("Error fetching module data.");
+        showNotification("Kon modulegegevens niet ophalen", "error");
       }
     };
   
     fetchData();
-  }, [moduleId]);
-  
+  }, [moduleId, showNotification]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -180,7 +174,6 @@ const ModuleEditorPage = () => {
     const [movedItem] = updatedItems.splice(fromIndex, 1);
     updatedItems.splice(toIndex, 0, movedItem);
 
-    // Update the order attribute for all items
     updatedItems.forEach((item, idx) => {
       item.order = idx + 1;
     });
@@ -192,11 +185,8 @@ const ModuleEditorPage = () => {
   };
 
   const handleSubmit = async () => {
-    setMessage("");
-    setError("");
-
     if (!formData.name.trim()) {
-      setError("Naam is verplicht.");
+      showNotification("Naam is verplicht", "error");
       return;
     }
 
@@ -212,27 +202,22 @@ const ModuleEditorPage = () => {
       };
 
       if (moduleId) {
-        const response = await axiosInstance.put(`/api/TrainingPath/${moduleId}`, payload);
-        setMessage("Module succesvol bijgewerkt!");
-        // Only navigate if there was no error
+        await axiosInstance.put(`/api/TrainingPath/${moduleId}`, payload);
+        showNotification("Module succesvol bijgewerkt!", "success");
         navigate("/modules");
       } else {
-        const response = await axiosInstance.post("/api/TrainingPath", payload);
-        setMessage("Module succesvol aangemaakt!");
-        // Only navigate if there was no error
+        await axiosInstance.post("/api/TrainingPath", payload);
+        showNotification("Module succesvol aangemaakt!", "success");
         navigate("/modules");
       }
     } catch (err) {
       console.error("Error saving module:", err);
-      // Extract error message from response if available
       const errorMessage = err.response?.data?.error || 
                           err.response?.data?.message || 
                           err.response?.data || 
                           err.message || 
                           "Er is een fout opgetreden bij het opslaan van de module.";
-      setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
-      
-      // Don't navigate if there was an error
+      showNotification(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage), "error");
       return;
     }
   };
@@ -240,11 +225,12 @@ const ModuleEditorPage = () => {
   const handleDeleteModule = async () => {
     try {
       await axiosInstance.delete(`/api/TrainingPath/${moduleId}`);
-      setMessage("Module succesvol verwijderd!");
+      showNotification("Module succesvol verwijderd!", "success");
       navigate("/modules");
     } catch (err) {
       console.error("Error deleting module:", err);
-      setError(err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van de module.");
+      const errorMessage = err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van de module";
+      showNotification(errorMessage, "error");
     }
     setDeleteDialogOpen(false);
   };
@@ -269,72 +255,69 @@ const ModuleEditorPage = () => {
             )}
           </Box>
 
-          {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               label="Naam"
               name="name"
-              variant="outlined"
               value={formData.name}
               onChange={handleInputChange}
+              required
             />
             <TextField
               label="Beschrijving"
               name="description"
-              variant="outlined"
-              multiline
-              rows={4}
               value={formData.description}
               onChange={handleInputChange}
+              multiline
+              rows={4}
             />
 
-            <Select
-              label="Selecteer een Quiz"
-              displayEmpty
-              fullWidth
-              value=""
-              onChange={(e) =>
-                handleAddItem("quiz", quizzes.find((q) => q.id === e.target.value))
-              }
-            >
-              <MenuItem value="" disabled>
-                Kies een quiz
-              </MenuItem>
-              {quizzes.map((quiz) => (
-                <MenuItem key={quiz.id} value={quiz.id}>
-                  {quiz.quizName}
-                </MenuItem>
-              ))}
-            </Select>
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Items Toevoegen
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                <Select
+                  value=""
+                  onChange={(e) => {
+                    const selectedQuiz = quizzes.find((q) => q.id === e.target.value);
+                    if (selectedQuiz) handleAddItem("quiz", selectedQuiz);
+                  }}
+                  displayEmpty
+                  sx={{ flexGrow: 1 }}
+                >
+                  <MenuItem value="" disabled>
+                    Selecteer een quiz
+                  </MenuItem>
+                  {quizzes.map((quiz) => (
+                    <MenuItem key={quiz.id} value={quiz.id}>
+                      {quiz.quizName}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <Select
+                  value=""
+                  onChange={(e) => {
+                    const selectedLesson = lessons.find((l) => l.id === e.target.value);
+                    if (selectedLesson) handleAddItem("lesson", selectedLesson);
+                  }}
+                  displayEmpty
+                  sx={{ flexGrow: 1 }}
+                >
+                  <MenuItem value="" disabled>
+                    Selecteer een les
+                  </MenuItem>
+                  {lessons.map((lesson) => (
+                    <MenuItem key={lesson.id} value={lesson.id}>
+                      {lesson.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Box>
 
-            <Select
-              label="Selecteer een Les"
-              displayEmpty
-              fullWidth
-              value=""
-              onChange={(e) =>
-                handleAddItem(
-                  "lesson",
-                  lessons.find((l) => l.id === e.target.value)
-                )
-              }
-            >
-              <MenuItem value="" disabled>
-                Kies een les
-              </MenuItem>
-              {lessons.map((lesson) => (
-                <MenuItem key={lesson.id} value={lesson.id}>
-                  {lesson.name}
-                </MenuItem>
-              ))}
-            </Select>
-
-            <Typography variant="h6" gutterBottom>
-              Geselecteerde Items
-            </Typography>
-            <Box sx={{ border: "1px solid #ccc", borderRadius: "4px", padding: "8px" }}>
+              <Typography variant="h6" gutterBottom>
+                Module Items
+              </Typography>
               {formData.items.map((item, index) => (
                 <DraggableItem
                   key={`${item.type}-${item.id}`}

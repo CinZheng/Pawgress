@@ -6,7 +6,6 @@ import {
   Button,
   Typography,
   Box,
-  Alert,
   CircularProgress,
   IconButton,
   Dialog,
@@ -18,6 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axiosInstance from "../axios";
 import Layout from "../components/Layout";
 import { isAdmin } from "../utils/auth";
+import { useNotification } from "../context/NotificationContext";
 
 const QuizEditorPage = () => {
   const [quiz, setQuiz] = useState({
@@ -25,14 +25,13 @@ const QuizEditorPage = () => {
     quizDescription: "",
     quizQuestions: [],
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const quizId = searchParams.get("id");
   const [isUserAdmin] = useState(isAdmin());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -48,14 +47,14 @@ const QuizEditorPage = () => {
         });
       } catch (error) {
         console.error("Fout bij ophalen van quiz:", error);
-        setError("Kon quizgegevens niet ophalen.");
+        showNotification("Kon quizgegevens niet ophalen", "error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchQuiz();
-  }, [quizId]);
+  }, [quizId, showNotification]);
 
   const handleQuizChange = (e) => {
     const { name, value } = e.target;
@@ -95,37 +94,34 @@ const QuizEditorPage = () => {
   };
 
   const handleSubmit = async () => {
-    setMessage("");
-    setError("");
-
     if (!quiz.quizName.trim()) {
-      setError("Naam is verplicht.");
+      showNotification("Naam is verplicht", "error");
       return;
     }
 
     try {
       if (quizId) {
         await axiosInstance.put(`/api/Quiz/${quizId}`, quiz);
-        setMessage("Quiz succesvol bijgewerkt!");
+        showNotification("Quiz succesvol bijgewerkt!", "success");
       } else {
         await axiosInstance.post("/api/Quiz", quiz);
-        setMessage("Quiz succesvol aangemaakt!");
+        showNotification("Quiz succesvol aangemaakt!", "success");
         navigate("/quizzes");
       }
     } catch (error) {
       console.error("Fout bij opslaan van quiz:", error);
-      setError("Er is een fout opgetreden bij het opslaan van de quiz.");
+      showNotification("Er is een fout opgetreden bij het opslaan van de quiz", "error");
     }
   };
 
   const handleDeleteQuiz = async () => {
     try {
       await axiosInstance.delete(`/api/Quiz/${quizId}`);
-      setMessage("Quiz succesvol verwijderd!");
+      showNotification("Quiz succesvol verwijderd!", "success");
       navigate("/quizzes");
     } catch (err) {
       console.error("Error deleting quiz:", err);
-      setError(err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van de quiz.");
+      showNotification("Er is een fout opgetreden bij het verwijderen van de quiz", "error");
     }
     setDeleteDialogOpen(false);
   };
@@ -161,9 +157,6 @@ const QuizEditorPage = () => {
             </Button>
           )}
         </Box>
-
-        {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <Box
           component="form"

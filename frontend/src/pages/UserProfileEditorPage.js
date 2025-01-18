@@ -6,10 +6,10 @@ import {
   TextField,
   Button,
   Box,
-  Alert,
 } from '@mui/material';
 import Layout from '../components/Layout';
 import axiosInstance from '../axios';
+import { useNotification } from '../context/NotificationContext';
 
 const UserProfileEditorPage = () => {
   const navigate = useNavigate();
@@ -17,8 +17,7 @@ const UserProfileEditorPage = () => {
     username: '',
     email: '',
   });
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const { showNotification } = useNotification();
   const userId = localStorage.getItem('userId');
 
   useEffect(() => {
@@ -31,12 +30,12 @@ const UserProfileEditorPage = () => {
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
-        setError('Failed to load user data');
+        showNotification('Kon gebruikersgegevens niet laden', 'error');
       }
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [userId, showNotification]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,11 +49,11 @@ const UserProfileEditorPage = () => {
     e.preventDefault();
     try {
       await axiosInstance.put(`/api/User/${userId}`, formData);
-      setMessage('Profile updated successfully');
+      showNotification('Profiel succesvol bijgewerkt!', 'success');
       setTimeout(() => navigate('/profile'), 1500);
     } catch (error) {
       console.error('Error updating profile:', error);
-      setError('Failed to update profile');
+      showNotification('Kon profiel niet bijwerken', 'error');
     }
   };
 
@@ -64,18 +63,6 @@ const UserProfileEditorPage = () => {
         <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
           Profiel Bewerken
         </Typography>
-
-        {message && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {message}
-          </Alert>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
 
         <Box
           component="form"

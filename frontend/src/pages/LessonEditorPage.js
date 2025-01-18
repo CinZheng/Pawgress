@@ -6,7 +6,6 @@ import {
   Button,
   Typography,
   Box,
-  Alert,
   CircularProgress,
   Dialog,
   DialogTitle,
@@ -20,6 +19,7 @@ import { marked } from "marked";
 import Layout from "../components/Layout";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { isAdmin } from "../utils/auth";
+import { useNotification } from "../context/NotificationContext";
 
 const LessonEditorPage = () => {
   const [formData, setFormData] = useState({
@@ -29,14 +29,13 @@ const LessonEditorPage = () => {
     video: "",
     tag: "",
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const lessonId = searchParams.get("id");
   const [isUserAdmin] = useState(isAdmin());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -54,14 +53,14 @@ const LessonEditorPage = () => {
         });
       } catch (error) {
         console.error("Fout bij ophalen van les:", error);
-        setError("Kon lesgegevens niet ophalen.");
+        showNotification("Kon lesgegevens niet ophalen", "error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchLesson();
-  }, [lessonId]);
+  }, [lessonId, showNotification]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -74,37 +73,36 @@ const LessonEditorPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
 
     if (!formData.name.trim()) {
-      setError("Naam is verplicht.");
+      showNotification("Naam is verplicht", "error");
       return;
     }
 
     try {
       if (lessonId) {
         await axiosInstance.put(`/api/Lesson/${lessonId}`, formData);
-        setMessage("Les succesvol bijgewerkt!");
+        showNotification("Les succesvol bijgewerkt!", "success");
       } else {
         await axiosInstance.post("/api/Lesson", formData);
-        setMessage("Les succesvol aangemaakt!");
+        showNotification("Les succesvol aangemaakt!", "success");
         navigate("/lessons");
       }
     } catch (error) {
       console.error("Fout bij opslaan van les:", error);
-      setError("Er is een fout opgetreden bij het opslaan van de les.");
+      showNotification("Er is een fout opgetreden bij het opslaan van de les", "error");
     }
   };
 
   const handleDeleteLesson = async () => {
     try {
       await axiosInstance.delete(`/api/Lesson/${lessonId}`);
-      setMessage("Les succesvol verwijderd!");
+      showNotification("Les succesvol verwijderd!", "success");
       navigate("/lessons");
     } catch (err) {
       console.error("Error deleting lesson:", err);
-      setError(err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van de les.");
+      const errorMessage = err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van de les";
+      showNotification(errorMessage, "error");
     }
     setDeleteDialogOpen(false);
   };
@@ -140,9 +138,6 @@ const LessonEditorPage = () => {
             </Button>
           )}
         </Box>
-
-        {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <Box
           component="form"

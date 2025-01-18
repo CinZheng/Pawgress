@@ -6,7 +6,6 @@ import {
   Button,
   Typography,
   Box,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -16,6 +15,7 @@ import axiosInstance from "../axios";
 import Layout from "../components/Layout";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { isAdmin } from "../utils/auth";
+import { useNotification } from "../context/NotificationContext";
 
 const DogProfileEditorPage = () => {
   const [formData, setFormData] = useState({
@@ -24,13 +24,12 @@ const DogProfileEditorPage = () => {
     dateOfBirth: "",
     image: "",
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dogId = searchParams.get("id");
   const [isUserAdmin] = useState(isAdmin());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const fetchDogProfile = async () => {
@@ -46,12 +45,12 @@ const DogProfileEditorPage = () => {
         });
       } catch (error) {
         console.error("Fout bij ophalen van hondenprofiel:", error);
-        setError("Kon hondenprofiel niet ophalen.");
+        showNotification("Kon hondenprofiel niet ophalen", "error");
       }
     };
 
     fetchDogProfile();
-  }, [dogId]);
+  }, [dogId, showNotification]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -60,11 +59,9 @@ const DogProfileEditorPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
 
     if (!formData.name.trim()) {
-      setError("Naam is verplicht.");
+      showNotification("Naam is verplicht", "error");
       return;
     }
 
@@ -78,27 +75,28 @@ const DogProfileEditorPage = () => {
 
       if (dogId) {
         await axiosInstance.put(`/api/DogProfile/${dogId}`, dataToSend);
-        setMessage("Hondenprofiel succesvol bijgewerkt!");
+        showNotification("Hondenprofiel succesvol bijgewerkt!", "success");
       } else {
         await axiosInstance.post("/api/DogProfile", dataToSend);
-        setMessage("Hondenprofiel succesvol aangemaakt!");
+        showNotification("Hondenprofiel succesvol aangemaakt!", "success");
         navigate("/dogprofiles");
       }
     } catch (error) {
       console.error("Fout bij opslaan van hondenprofiel:", error);
       const errorMessage = error.response?.data?.message || error.response?.data || "Er is een fout opgetreden bij het opslaan van het hondenprofiel.";
-      setError(errorMessage);
+      showNotification(errorMessage, "error");
     }
   };
 
   const handleDeleteDogProfile = async () => {
     try {
       await axiosInstance.delete(`/api/DogProfile/${dogId}`);
-      setMessage("Hondenprofiel succesvol verwijderd!");
+      showNotification("Hondenprofiel succesvol verwijderd!", "success");
       navigate("/dogprofiles");
     } catch (err) {
       console.error("Error deleting dog profile:", err);
-      setError(err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van het hondenprofiel.");
+      const errorMessage = err.response?.data?.error || "Er is een fout opgetreden bij het verwijderen van het hondenprofiel.";
+      showNotification(errorMessage, "error");
     }
     setDeleteDialogOpen(false);
   };
@@ -121,9 +119,6 @@ const DogProfileEditorPage = () => {
             </Button>
           )}
         </Box>
-
-        {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <Box
           component="form"

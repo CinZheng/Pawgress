@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { Container, Typography, TextField, Button, Box, Alert } from "@mui/material";
+import { Container, Typography, TextField, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axios";
 import Layout from "../components/Layout";
+import { useNotification } from "../context/NotificationContext";
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,9 +21,10 @@ const LoginPage = ({ onLogin }) => {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("userId", response.data.userId);
       onLogin();
+      showNotification("Succesvol ingelogd!", "success");
       navigate("/modules");
     } catch (error) {
-      setError("Ongeldige inloggegevens");
+      showNotification("Ongeldige inloggegevens", "error");
     }
   };
 
@@ -55,8 +57,6 @@ const LoginPage = ({ onLogin }) => {
             Inloggen
           </Button>
         </Box>
-
-        {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
         
         <Typography sx={{ marginTop: 2, textAlign: "center" }}>
           Nog geen account?{" "}
