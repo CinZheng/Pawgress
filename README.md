@@ -150,36 +150,14 @@ npm test
 npm test -- --coverage
 ```
 
-## 🤝 Bijdragen
-
-We verwelkomen bijdragen aan het Pawgress project! Volg deze stappen:
-
-1. Fork de repository
-2. Maak een feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit je wijzigingen (`git commit -m 'Add some AmazingFeature'`)
-4. Push naar de branch (`git push origin feature/AmazingFeature`)
-5. Open een Pull Request
-
 ### Code Standaarden
 - Volg de bestaande code stijl
 - Schrijf unit tests voor nieuwe functionaliteit
 - Update documentatie waar nodig
 - Zorg voor duidelijke commit messages
 
-## 📄 Licentie
-
-Dit project is gelicentieerd onder de MIT License - zie het [LICENSE](LICENSE) bestand voor details.
 
 ## 🙏 Dankwoord
 
 Speciale dank aan alle bijdragers die hebben geholpen bij het ontwikkelen van Pawgress.
 
-## 📞 Contact
-
-Voor vragen of ondersteuning:
-- Email: [support@pawgress.com](mailto:support@pawgress.com)
-- GitHub Issues: [https://github.com/[username]/Pawgress/issues](https://github.com/[username]/Pawgress/issues)
-
----
-
-Gemaakt met ❤️ voor honden en hun trainers
