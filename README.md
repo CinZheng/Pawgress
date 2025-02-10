@@ -16,7 +16,7 @@ Een uitgebreide web-applicatie voor het beheren en volgen van hondentraining en 
 
 ## 🎯 Overzicht
 
-Pawgress is een moderne web-applicatie die hondentrainers en eigenaren helpt bij het volgen en beheren van de ontwikkeling van hun honden. Het platform biedt uitgebreide functionaliteit voor het bijhouden van trainingsvoortgang, gezondheidsgegevens en gedragsontwikkeling.
+Pawgress is een moderne web-applicatie die hondentrainers helpt bij het volgen en beheren van de ontwikkeling van hun honden. Het platform biedt uitgebreide functionaliteit voor het bijhouden van trainingsvoortgang, gezondheidsgegevens en gedragsontwikkeling.
 
 ## ✨ Functionaliteiten
 
@@ -102,33 +102,12 @@ Maak een `.env` bestand aan in de frontend directory:
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
-## 📱 Gebruik
-
-### Eerste Stappen
-1. Registreer een nieuw account
-2. Log in met je credentials
-3. Maak een hondenprofiel aan
-4. Begin met het volgen van trainingsmodules
-
-### Trainingsmodules
-- Kies een beschikbare module
-- Volg de lessen en instructies
-- Maak quizzen om voortgang te testen
-- Bekijk resultaten en statistieken
-
 ## 📚 API Documentatie
 
 De API documentatie is beschikbaar via Swagger UI:
 ```
 http://localhost:5000/swagger
 ```
-
-### Belangrijke Endpoints
-- `/api/DogProfile`: Hondenprofiel management
-- `/api/Training`: Trainingsmodule endpoints
-- `/api/Quiz`: Quiz en voortgang
-- `/api/Notes`: Notitie systeem
-- `/api/Users`: Gebruikersbeheer
 
 ## 🧪 Testing
 
@@ -156,8 +135,4 @@ npm test -- --coverage
 - Update documentatie waar nodig
 - Zorg voor duidelijke commit messages
 
-
-## 🙏 Dankwoord
-
-Speciale dank aan alle bijdragers die hebben geholpen bij het ontwikkelen van Pawgress.
 
